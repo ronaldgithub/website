@@ -41,4 +41,14 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/index-tuning.html"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/index-tuning.html"/>
   </url>
+  <url>
+    <loc>https://dbaronald.com/nl/blog/parameter-sniffing.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/parameter-sniffing.html"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/parameter-sniffing.html"/>
+  </url>
+  <url>
+    <loc>https://dbaronald.com/en/blog/parameter-sniffing.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/parameter-sniffing.html"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/parameter-sniffing.html"/>
+  </url>
 </urlset>

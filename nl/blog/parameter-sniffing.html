@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parameter sniffing: als één plan niet voor iedereen past — Ronald de Groot</title>
+<meta name="description" content="Waarom een stored procedure ineens traag wordt: parameter sniffing uitgelegd. Hoe je het herkent in Query Store en welke vijf oplossingen wanneer passen — van OPTIMIZE FOR tot RECOMPILE.">
+<link rel="canonical" href="https://dbaronald.com/nl/blog/parameter-sniffing.html">
+<link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/parameter-sniffing.html">
+<link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/parameter-sniffing.html">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="stylesheet" href="/assets/css/style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Parameter sniffing: als één plan niet voor iedereen past">
+<meta property="og:description" content="Waarom een stored procedure ineens traag wordt — en vijf oplossingen die wél passen bij de oorzaak.">
+<meta property="og:url" content="https://dbaronald.com/nl/blog/parameter-sniffing.html">
+<meta property="og:image" content="https://dbaronald.com/assets/img/ronald.jpg">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/nl/"><span class="prompt">ronald@dbaronald</span>:~$<span class="cursor"></span></a>
+    <nav class="site-nav" id="nav">
+      <a href="/nl/#over">Over mij</a>
+      <a href="/nl/#skills">Skills</a>
+      <a href="/nl/#ervaring">Ervaring</a>
+      <a href="/nl/blog/">SQL Tips</a>
+      <a href="/nl/#contact">Contact</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a class="lang-switch" href="/en/blog/parameter-sniffing.html" data-lang="en" title="Read in English">EN</a>
+      <button class="nav-toggle" aria-label="Menu" aria-controls="nav">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<article class="article">
+  <a class="back" href="/nl/blog/">← Alle SQL tips</a>
+  <h1>Parameter sniffing: als één plan niet voor iedereen past</h1>
+  <p class="meta">-- performance tuning · Ronald de Groot</p>
+
+  <p>Het klassieke telefoontje: "die procedure was altijd snel, en sinds vanochtend duurt hij minuten — en we hebben níets veranderd." Negen van de tien keer is dit parameter sniffing. Geen bug, maar een ontwerpkeuze van SQL Server die meestal goed uitpakt — en soms desastreus.</p>
+
+  <h2>Wat er gebeurt</h2>
+  <p>Bij de eerste uitvoering van een stored procedure (of geparametriseerde query) "snuift" de optimizer de waarden van de parameters op en bouwt daar het beste plan voor. Dat plan gaat de plan cache in en wordt hergebruikt voor <em>alle</em> volgende aanroepen — ongeacht hun parameterwaarden.</p>
+  <p>Dat is meestal precies wat je wilt: compileren is duur, en waarom zou je het plan opnieuw bouwen voor elke aanroep? Het gaat mis als de datadistributie scheef is:</p>
+  <pre><code>CREATE PROCEDURE dbo.GetOrders @CustomerID int
+AS
+SELECT OrderID, OrderDate, TotalAmount
+FROM   dbo.Orders
+WHERE  CustomerID = @CustomerID;
+
+-- Klant 42: 12 orders     → ideaal: Index Seek + Key Lookup
+-- Klant 1001: 4,2 miljoen → ideaal: Clustered Index Scan</code></pre>
+  <p>Wordt het plan gecompileerd voor klant 42, dan doet diezelfde seek-met-lookup er bij klant 1001 miljoenen lookups — minuten in plaats van milliseconden. Andersom net zo goed: een scan-plan gecompileerd voor klant 1001 leest voor klant 42 de hele tabel om 12 rijen te vinden.</p>
+
+  <h2>Zo herken je het</h2>
+  <ul>
+    <li><strong>Wisselvallig gedrag</strong>: dezelfde procedure is snel of traag afhankelijk van... niets aanwijsbaars. Vaak "geneest" hij spontaan na een failover, herstart of index rebuild — alles wat de plan cache leegt.</li>
+    <li><strong>Estimated vs. actual rows</strong> in het actuele plan wijken enorm af (zie mijn artikel over <a href="/nl/blog/executieplannen-lezen.html">executieplannen lezen</a>) — maar de <em>estimate</em> klopte wél voor de gesniffde waarde. Die waarde vind je in het plan-XML onder <code>ParameterCompiledValue</code>.</li>
+    <li><strong>Query Store</strong> maakt het zichtbaar: één query met meerdere plannen, waarvan de looptijd per plan enorm verschilt. De grafiek "plan per tijdvak" vertelt precies wanneer het foute plan de cache in ging.</li>
+  </ul>
+
+  <h2>Vijf oplossingen — en wanneer welke past</h2>
+
+  <h3>1. OPTION (RECOMPILE): altijd het beste plan, altijd compileren</h3>
+  <pre><code>SELECT ... FROM dbo.Orders
+WHERE  CustomerID = @CustomerID
+OPTION (RECOMPILE);</code></pre>
+  <p>Elke uitvoering krijgt een vers plan voor de échte waarden. Perfect voor rapportage-queries die enkele keren per minuut draaien; te duur voor een OLTP-query die duizend keer per seconde langskomt — dan betaal je continu CPU voor het compileren.</p>
+
+  <h3>2. OPTIMIZE FOR: kies bewust één scenario</h3>
+  <pre><code>OPTION (OPTIMIZE FOR (@CustomerID = 1001));   -- plan voor de grote klant
+-- of:
+OPTION (OPTIMIZE FOR UNKNOWN);                -- plan voor het "gemiddelde"</code></pre>
+  <p><code>OPTIMIZE FOR UNKNOWN</code> negeert het snuiven en pakt de gemiddelde dichtheid uit de statistieken. Dat maakt de performance <em>voorspelbaar</em> — niet per se optimaal. Kies dit als een stabiel middenplan beter is dan gokken.</p>
+
+  <h3>3. Herschrijven: splits de scenario's</h3>
+  <p>De nette structurele oplossing bij echt scheve data: stuur grote en kleine klanten naar aparte (sub)procedures, zodat elk zijn eigen gecachte plan krijgt. Meer code, maar beide paden krijgen blijvend hun ideale plan.</p>
+
+  <h3>4. Query Store: forceer het goede plan</h3>
+  <p>Vanaf SQL Server 2016 vaak de snelste productie-fix: in Query Store het goed presterende plan aanwijzen en <strong>Force Plan</strong> klikken (of <code>sp_query_store_force_plan</code>). Vanaf SQL 2022 doet <em>Automatic Plan Correction</em> dit zelfs automatisch bij een aantoonbare regressie.</p>
+
+  <h3>5. De noodrem: één plan eruit gooien</h3>
+  <pre><code>-- Haal alleen het plan van deze procedure uit de cache:
+EXEC sp_recompile 'dbo.GetOrders';</code></pre>
+  <p>Geen structurele oplossing — het lost niets op voor de volgende keer — maar om 3 uur 's nachts is het een prima eerste hulp. Gebruik nooit <code>DBCC FREEPROCCACHE</code> zonder plan handle op een drukke server: dan hercompileert álles.</p>
+
+  <h2>Wat ik in de praktijk doe</h2>
+  <ol>
+    <li>Bevestig de diagnose in Query Store: meerdere plannen, sterk wisselende looptijden, afwijkende <code>ParameterCompiledValue</code>.</li>
+    <li>Acute pijn? Plan forceren (of <code>sp_recompile</code>) om de productie te ontlasten.</li>
+    <li>Daarna structureel kiezen: RECOMPILE voor laagfrequente rapportages, OPTIMIZE FOR of een herschrijf voor hoogfrequente OLTP-paden.</li>
+    <li>En check de indexen: soms is de echte oorzaak dat er voor het "grote" scenario gewoon een <a href="/nl/blog/index-tuning.html">betere index</a> zou moeten bestaan — dan verdwijnt het verschil tussen de plannen vanzelf.</li>
+  </ol>
+
+  <blockquote><p>Een procedure die zich onvoorspelbaar gedraagt en je komt er niet uit? <a href="/nl/#contact">Stuur me het plan</a> — daar kijk ik graag even naar.</p></blockquote>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="sql-tip"><span class="lbl">-- SQL-tip van de dag:</span> <span id="sql-tip-text"></span></div>
+    <div class="footer-row">
+      <span>© <span id="year">2026</span> Ronald de Groot · <a href="https://www.opendata.nl" rel="noopener">OpenData.nl</a></span>
+      <nav>
+        <a href="/nl/blog/">SQL Tips</a>
+        <a href="/en/blog/parameter-sniffing.html" data-lang="en">English</a>
+        <a href="/nl/#contact">Contact</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>
