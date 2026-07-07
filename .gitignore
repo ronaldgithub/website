@@ -1,0 +1,6 @@
+# Private documents (CV contains home address and phone number) — never publish
+docs/
+
+# OS clutter
+Thumbs.db
+.DS_Store

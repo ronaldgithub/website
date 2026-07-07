@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Executieplannen lezen: waar kijk je het eerst naar? — Ronald de Groot</title>
+<meta name="description" content="Vijf praktische checks waarmee je in de meeste SQL Server executieplannen binnen enkele minuten de boosdoener vindt: dikke pijlen, scans, key lookups, cardinality en warnings.">
+<link rel="canonical" href="https://dbaronald.com/nl/blog/executieplannen-lezen.html">
+<link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/executieplannen-lezen.html">
+<link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/reading-execution-plans.html">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="stylesheet" href="/assets/css/style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Executieplannen lezen: waar kijk je het eerst naar?">
+<meta property="og:description" content="Vijf praktische checks om snel de boosdoener in een SQL Server executieplan te vinden.">
+<meta property="og:url" content="https://dbaronald.com/nl/blog/executieplannen-lezen.html">
+<meta property="og:image" content="https://dbaronald.com/assets/img/ronald.jpg">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/nl/"><span class="prompt">ronald@dbaronald</span>:~$<span class="cursor"></span></a>
+    <nav class="site-nav" id="nav">
+      <a href="/nl/#over">Over mij</a>
+      <a href="/nl/#skills">Skills</a>
+      <a href="/nl/#ervaring">Ervaring</a>
+      <a href="/nl/blog/">SQL Tips</a>
+      <a href="/nl/#contact">Contact</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a class="lang-switch" href="/en/blog/reading-execution-plans.html" data-lang="en" title="Read in English">EN</a>
+      <button class="nav-toggle" aria-label="Menu" aria-controls="nav">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<article class="article">
+  <a class="back" href="/nl/blog/">← Alle SQL tips</a>
+  <h1>Executieplannen lezen: waar kijk je het eerst naar?</h1>
+  <p class="meta">-- performance tuning · Ronald de Groot</p>
+
+  <p>Een executieplan van een flinke query kan tientallen operators bevatten. Waar begin je? Na dertig jaar performance tuning is mijn ervaring: in negen van de tien plannen vind je de boosdoener met de vijf checks hieronder — meestal binnen een paar minuten.</p>
+
+  <blockquote><p>Gebruik bij voorkeur het <strong>actual execution plan</strong> (of Query Store / het plan uit de plan cache met runtime-statistieken). Het estimated plan laat alleen zien wat de optimizer <em>dacht</em>, niet wat er echt gebeurde.</p></blockquote>
+
+  <h2>1. Volg de dikke pijlen</h2>
+  <p>De dikte van een pijl tussen twee operators staat voor het aantal rijen dat erdoorheen stroomt. Begin rechtsboven (daar begint SQL Server met lezen) en volg de dikste pijlen. Vaak zie je dat er miljoenen rijen worden gelezen terwijl de query er maar een paar honderd teruggeeft: al die rijen zijn dan te laat weggefilterd. Dat is bijna altijd een teken dat een index op de filterkolom ontbreekt, of dat een predicaat niet <em>sargable</em> is.</p>
+  <pre><code>-- Niet sargable: functie over de kolom, index onbruikbaar
+WHERE YEAR(OrderDate) = 2026
+
+-- Wel sargable: de index op OrderDate kan een seek doen
+WHERE OrderDate &gt;= '2026-01-01' AND OrderDate &lt; '2027-01-01'</code></pre>
+
+  <h2>2. Scan waar je een seek verwacht</h2>
+  <p>Een <strong>Clustered Index Scan</strong> of <strong>Index Scan</strong> op een grote tabel, terwijl je query maar een handvol rijen nodig heeft, is check nummer twee. Veelvoorkomende oorzaken:</p>
+  <ul>
+    <li>Er bestaat geen index die het WHERE-predicaat ondersteunt.</li>
+    <li>Impliciete conversie: kolom is <code>varchar</code>, parameter is <code>nvarchar</code> — zoek naar <code>CONVERT_IMPLICIT</code> in het plan.</li>
+    <li>Een functie of berekening over de kolom (zie punt 1).</li>
+  </ul>
+  <p>Let op: een scan is niet per definitie fout. Bij een kleine tabel, of als je écht bijna alle rijen nodig hebt, is een scan juist de goedkoopste keuze.</p>
+
+  <h2>3. Key Lookups met hoge aantallen</h2>
+  <p>Een <strong>Key Lookup</strong> betekent: de nonclustered index leverde de rij op, maar er ontbraken kolommen, dus moet SQL Server per rij terug naar de clustered index. Bij tien rijen geen probleem; bij honderdduizend rijen is dat honderdduizend keer extra I/O. De oplossing is meestal een <em>covering index</em>:</p>
+  <pre><code>CREATE INDEX IX_Orders_CustomerID
+ON dbo.Orders (CustomerID)
+INCLUDE (OrderDate, TotalAmount);   -- lookup-kolommen mee in de index</code></pre>
+  <p>In mijn artikel over <a href="/nl/blog/index-tuning.html">index tuning</a> ga ik hier dieper op in.</p>
+
+  <h2>4. Estimated vs. actual rows: klopt de schatting?</h2>
+  <p>Vergelijk per operator het geschatte aantal rijen met het werkelijke aantal. Een afwijking van een factor 10, 100 of meer betekent dat de optimizer zijn keuzes (join-type, geheugen, volgorde) op verkeerde informatie baseerde. De meest voorkomende oorzaken:</p>
+  <ul>
+    <li><strong>Verouderde statistieken</strong> — draai <code>UPDATE STATISTICS</code> of gebruik de maintenance solution van Ola Hallengren.</li>
+    <li><strong>Parameter sniffing</strong> — het plan is gecompileerd voor een parameterwaarde met heel andere aantallen.</li>
+    <li><strong>Table variables</strong> — die schatten van oudsher 1 rij (tot SQL 2019's deferred compilation).</li>
+  </ul>
+
+  <h2>5. Warnings: de uitroeptekens</h2>
+  <p>Operators met een geel uitroepteken verdienen altijd een blik. De belangrijkste warnings:</p>
+  <table>
+    <tr><th>Warning</th><th>Betekenis</th></tr>
+    <tr><td>Spill to tempdb</td><td>Te weinig geheugen toegekend; sort of hash join valt terug op tempdb — vaak gevolg van slechte schattingen (punt 4).</td></tr>
+    <tr><td>Implicit conversion</td><td>Datatype-mismatch; kan index seeks onmogelijk maken (punt 2).</td></tr>
+    <tr><td>No join predicate</td><td>Cartesisch product — bijna altijd een vergeten JOIN-conditie.</td></tr>
+    <tr><td>Excessive memory grant</td><td>Query vroeg veel meer geheugen dan gebruikt; drukt andere queries weg.</td></tr>
+  </table>
+
+  <h2>Tot slot: meet ook buiten het plan</h2>
+  <p>Het plan vertelt niet alles. Zet bij het tunen ook dit aan:</p>
+  <pre><code>SET STATISTICS IO, TIME ON;</code></pre>
+  <p>De <code>logical reads</code> per tabel zijn de eerlijkste maatstaf om een voor- en na-situatie te vergelijken: ze zijn onafhankelijk van cache en serverbelasting. Daalt het aantal logical reads dramatisch, dan is je fix echt een verbetering — wat de kostenpercentages in het plan ook beweren.</p>
+
+  <blockquote><p>Hulp nodig bij een hardnekkig traag plan? <a href="/nl/#contact">Neem gerust contact op</a> — een second opinion op een executieplan is zo gegeven.</p></blockquote>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="sql-tip"><span class="lbl">-- SQL-tip van de dag:</span> <span id="sql-tip-text"></span></div>
+    <div class="footer-row">
+      <span>© <span id="year">2026</span> Ronald de Groot · <a href="https://www.opendata.nl" rel="noopener">OpenData.nl</a></span>
+      <nav>
+        <a href="/nl/blog/">SQL Tips</a>
+        <a href="/en/blog/reading-execution-plans.html" data-lang="en">English</a>
+        <a href="/nl/#contact">Contact</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

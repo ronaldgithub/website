@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Index tuning: clustered, nonclustered en included columns — Ronald de Groot</title>
+<meta name="description" content="Hoe kies je de juiste SQL Server index? Over clustered vs. nonclustered, kolomvolgorde in de key, wanneer INCLUDE-kolommen lonen en hoe je ongebruikte indexen opspoort.">
+<link rel="canonical" href="https://dbaronald.com/nl/blog/index-tuning.html">
+<link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/index-tuning.html">
+<link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/index-tuning.html">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="stylesheet" href="/assets/css/style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Index tuning: clustered, nonclustered en included columns">
+<meta property="og:description" content="De juiste index maakt het verschil tussen milliseconden en minuten. Zo kies je kolomvolgorde en wanneer INCLUDE loont.">
+<meta property="og:url" content="https://dbaronald.com/nl/blog/index-tuning.html">
+<meta property="og:image" content="https://dbaronald.com/assets/img/ronald.jpg">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/nl/"><span class="prompt">ronald@dbaronald</span>:~$<span class="cursor"></span></a>
+    <nav class="site-nav" id="nav">
+      <a href="/nl/#over">Over mij</a>
+      <a href="/nl/#skills">Skills</a>
+      <a href="/nl/#ervaring">Ervaring</a>
+      <a href="/nl/blog/">SQL Tips</a>
+      <a href="/nl/#contact">Contact</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a class="lang-switch" href="/en/blog/index-tuning.html" data-lang="en" title="Read in English">EN</a>
+      <button class="nav-toggle" aria-label="Menu" aria-controls="nav">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<article class="article">
+  <a class="back" href="/nl/blog/">← Alle SQL tips</a>
+  <h1>Index tuning: clustered, nonclustered en included columns</h1>
+  <p class="meta">-- indexen · Ronald de Groot</p>
+
+  <p>De juiste index maakt het verschil tussen milliseconden en minuten. Maar "gooi er een index tegenaan" is geen strategie: elke index kost schrijfperformance, opslag en onderhoud. In dit artikel de afwegingen die ik in de praktijk maak.</p>
+
+  <h2>De clustered index: kies hem bewust</h2>
+  <p>De clustered index <em>is</em> de tabel: de bladpagina's bevatten alle data, fysiek gesorteerd op de clustering key. Je hebt er maar één, dus kies bewust. Een goede clustering key is:</p>
+  <ul>
+    <li><strong>Smal</strong> — de key komt terug in élke nonclustered index van de tabel.</li>
+    <li><strong>Uniek</strong> — anders plakt SQL Server er zelf een 4-byte uniquifier aan.</li>
+    <li><strong>Oplopend</strong> — nieuwe rijen komen achteraan, geen page splits midden in de tabel.</li>
+    <li><strong>Statisch</strong> — een wijziging van de clustering key verplaatst de hele rij én raakt alle nonclustered indexen.</li>
+  </ul>
+  <p>Een <code>INT IDENTITY</code> of oplopende <code>BIGINT</code> voldoet meestal prima. Een random <code>UNIQUEIDENTIFIER</code> (via <code>NEWID()</code>) is de klassieke valkuil: page splits en fragmentatie gegarandeerd.</p>
+
+  <h2>Nonclustered: kolomvolgorde is alles</h2>
+  <p>Een nonclustered index op <code>(A, B)</code> is gesorteerd op A, en pas bínnen gelijke A-waarden op B. Denk aan een telefoonboek: gesorteerd op achternaam, dan voornaam. Zoeken op voornaam alleen? Dan moet je het hele boek door.</p>
+  <pre><code>CREATE INDEX IX_Orders_Customer_Date
+ON dbo.Orders (CustomerID, OrderDate);
+
+-- Index Seek: leidende kolom in het predicaat
+WHERE CustomerID = 42
+WHERE CustomerID = 42 AND OrderDate &gt;= '2026-01-01'
+
+-- Geen seek mogelijk: leidende kolom ontbreekt
+WHERE OrderDate &gt;= '2026-01-01'</code></pre>
+  <p>Vuistregels voor de volgorde van de key-kolommen:</p>
+  <ul>
+    <li>Kolommen waarop je met <strong>=</strong> filtert eerst, daarna de range-kolommen (<code>&gt;</code>, <code>&lt;</code>, <code>BETWEEN</code>).</li>
+    <li>Bij meerdere equality-kolommen: de meest selectieve combinatie voorop is mooi, maar <em>herbruikbaarheid</em> voor andere queries weegt vaak zwaarder.</li>
+    <li>Een index op <code>(A, B)</code> maakt een aparte index op <code>(A)</code> overbodig.</li>
+  </ul>
+
+  <h2>INCLUDE: de covering index</h2>
+  <p>Kolommen in de <code>INCLUDE</code>-lijst staan alleen op de bladpagina's van de index — ze sturen de sortering niet, maar voorkomen wél de Key Lookup terug naar de tabel. Zie je in een executieplan een Key Lookup met veel rijen, dan is dit bijna altijd de fix:</p>
+  <pre><code>-- Query:
+SELECT OrderDate, TotalAmount
+FROM   dbo.Orders
+WHERE  CustomerID = 42;
+
+-- Covering index: seek op CustomerID, geen lookup meer nodig
+CREATE INDEX IX_Orders_CustomerID
+ON dbo.Orders (CustomerID)
+INCLUDE (OrderDate, TotalAmount);</code></pre>
+  <p>Waarom niet gewoon alles in de key? Omdat key-kolommen op elk niveau van de index-boom staan en de 900-byte/32-kolommen keylimiet meetellen. INCLUDE-kolommen staan alleen in het blad: goedkoper. Maar wees zuinig — een index die "voor de zekerheid" tien kolommen include't, is een halve kopie van de tabel die bij elke update mee moet.</p>
+
+  <h2>Opruimen: welke indexen doen niets?</h2>
+  <p>Indexen die nooit gelezen maar wel onderhouden worden, kosten alleen maar. Zo vind je ze:</p>
+  <pre><code>SELECT o.name AS tabel, i.name AS [index],
+       s.user_seeks, s.user_scans, s.user_lookups, s.user_updates
+FROM   sys.dm_db_index_usage_stats s
+JOIN   sys.indexes i  ON i.object_id = s.object_id AND i.index_id = s.index_id
+JOIN   sys.objects o  ON o.object_id = s.object_id
+WHERE  s.database_id = DB_ID()
+  AND  o.is_ms_shipped = 0
+  AND  s.user_seeks + s.user_scans + s.user_lookups = 0
+ORDER BY s.user_updates DESC;</code></pre>
+  <blockquote><p>Let op: deze DMV wordt geleegd bij een herstart. Oordeel pas na een volledige businesscyclus — die ene index kan voor het maandeinde- of jaarwerkproces bestaan.</p></blockquote>
+
+  <h2>Missing index suggesties: startpunt, geen gospel</h2>
+  <p>De missing-index-DMV's (en de groene hint in SSMS) zijn handig, maar naïef: ze kijken per query, stellen kolomvolgordes voor die niet altijd kloppen en stapelen graag tien bijna-identieke indexen op elkaar. Mijn werkwijze: verzamel de suggesties, groepeer ze per tabel, en ontwerp dan zélf één of twee indexen die meerdere queries tegelijk bedienen.</p>
+
+  <p>Zo houd je een indexlandschap dat je queries draagt in plaats van je writes verstikt: een bewuste clustered index, een handvol doordachte nonclustered indexen met de juiste kolomvolgorde, INCLUDE waar het lookup-pijn wegneemt — en periodiek opruimen wat niet gebruikt wordt.</p>
+
+  <blockquote><p>Twijfel over het indexontwerp van een drukke tabel? <a href="/nl/#contact">Ik kijk graag even mee</a>.</p></blockquote>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="sql-tip"><span class="lbl">-- SQL-tip van de dag:</span> <span id="sql-tip-text"></span></div>
+    <div class="footer-row">
+      <span>© <span id="year">2026</span> Ronald de Groot · <a href="https://www.opendata.nl" rel="noopener">OpenData.nl</a></span>
+      <nav>
+        <a href="/nl/blog/">SQL Tips</a>
+        <a href="/en/blog/index-tuning.html" data-lang="en">English</a>
+        <a href="/nl/#contact">Contact</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

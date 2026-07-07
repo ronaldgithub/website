@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading execution plans: what to check first? — Ronald de Groot</title>
+<meta name="description" content="Five practical checks that find the culprit in most SQL Server execution plans within minutes: thick arrows, scans, key lookups, cardinality estimates and warnings.">
+<link rel="canonical" href="https://dbaronald.com/en/blog/reading-execution-plans.html">
+<link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/executieplannen-lezen.html">
+<link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/reading-execution-plans.html">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="stylesheet" href="/assets/css/style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Reading execution plans: what to check first?">
+<meta property="og:description" content="Five practical checks to quickly find the culprit in a SQL Server execution plan.">
+<meta property="og:url" content="https://dbaronald.com/en/blog/reading-execution-plans.html">
+<meta property="og:image" content="https://dbaronald.com/assets/img/ronald.jpg">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/en/"><span class="prompt">ronald@dbaronald</span>:~$<span class="cursor"></span></a>
+    <nav class="site-nav" id="nav">
+      <a href="/en/#about">About</a>
+      <a href="/en/#skills">Skills</a>
+      <a href="/en/#experience">Experience</a>
+      <a href="/en/blog/">SQL Tips</a>
+      <a href="/en/#contact">Contact</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a class="lang-switch" href="/nl/blog/executieplannen-lezen.html" data-lang="nl" title="Lees in het Nederlands">NL</a>
+      <button class="nav-toggle" aria-label="Menu" aria-controls="nav">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<article class="article">
+  <a class="back" href="/en/blog/">← All SQL tips</a>
+  <h1>Reading execution plans: what to check first?</h1>
+  <p class="meta">-- performance tuning · Ronald de Groot</p>
+
+  <p>An execution plan for a sizeable query can contain dozens of operators. Where do you start? After thirty years of performance tuning, my experience is: in nine out of ten plans you'll find the culprit with the five checks below — usually within a few minutes.</p>
+
+  <blockquote><p>Prefer the <strong>actual execution plan</strong> (or Query Store / the cached plan with runtime statistics). The estimated plan only shows what the optimizer <em>thought</em> would happen, not what actually did.</p></blockquote>
+
+  <h2>1. Follow the thick arrows</h2>
+  <p>The thickness of an arrow between two operators represents the number of rows flowing through it. Start at the top right (that's where SQL Server starts reading) and follow the thickest arrows. Often you'll see millions of rows being read while the query only returns a few hundred: all those rows were filtered out too late. That's almost always a sign that an index on the filter column is missing, or that a predicate isn't <em>sargable</em>.</p>
+  <pre><code>-- Not sargable: function wrapped around the column, index unusable
+WHERE YEAR(OrderDate) = 2026
+
+-- Sargable: the index on OrderDate can do a seek
+WHERE OrderDate &gt;= '2026-01-01' AND OrderDate &lt; '2027-01-01'</code></pre>
+
+  <h2>2. A scan where you expect a seek</h2>
+  <p>A <strong>Clustered Index Scan</strong> or <strong>Index Scan</strong> on a large table, while your query only needs a handful of rows, is check number two. Common causes:</p>
+  <ul>
+    <li>No index exists that supports the WHERE predicate.</li>
+    <li>Implicit conversion: the column is <code>varchar</code>, the parameter is <code>nvarchar</code> — look for <code>CONVERT_IMPLICIT</code> in the plan.</li>
+    <li>A function or calculation applied to the column (see point 1).</li>
+  </ul>
+  <p>Note: a scan isn't wrong by definition. For a small table, or when you genuinely need almost all rows, a scan is actually the cheapest choice.</p>
+
+  <h2>3. Key Lookups with high row counts</h2>
+  <p>A <strong>Key Lookup</strong> means: the nonclustered index produced the row, but some columns were missing, so SQL Server has to go back to the clustered index for every row. With ten rows, no problem; with a hundred thousand rows, that's a hundred thousand extra I/O operations. The fix is usually a <em>covering index</em>:</p>
+  <pre><code>CREATE INDEX IX_Orders_CustomerID
+ON dbo.Orders (CustomerID)
+INCLUDE (OrderDate, TotalAmount);   -- carry the lookup columns in the index</code></pre>
+  <p>I go deeper into this in my article on <a href="/en/blog/index-tuning.html">index tuning</a>.</p>
+
+  <h2>4. Estimated vs. actual rows: is the estimate right?</h2>
+  <p>For each operator, compare the estimated row count with the actual one. A deviation by a factor of 10, 100 or more means the optimizer based its choices (join type, memory, order) on wrong information. The most common causes:</p>
+  <ul>
+    <li><strong>Stale statistics</strong> — run <code>UPDATE STATISTICS</code> or use Ola Hallengren's maintenance solution.</li>
+    <li><strong>Parameter sniffing</strong> — the plan was compiled for a parameter value with very different row counts.</li>
+    <li><strong>Table variables</strong> — historically estimated at 1 row (until SQL 2019's deferred compilation).</li>
+  </ul>
+
+  <h2>5. Warnings: the exclamation marks</h2>
+  <p>Operators with a yellow exclamation mark always deserve a look. The most important warnings:</p>
+  <table>
+    <tr><th>Warning</th><th>Meaning</th></tr>
+    <tr><td>Spill to tempdb</td><td>Too little memory granted; a sort or hash join falls back to tempdb — often the result of bad estimates (point 4).</td></tr>
+    <tr><td>Implicit conversion</td><td>Data type mismatch; can make index seeks impossible (point 2).</td></tr>
+    <tr><td>No join predicate</td><td>Cartesian product — almost always a forgotten JOIN condition.</td></tr>
+    <tr><td>Excessive memory grant</td><td>The query requested far more memory than it used; squeezes out other queries.</td></tr>
+  </table>
+
+  <h2>Finally: measure beyond the plan</h2>
+  <p>The plan doesn't tell you everything. When tuning, also switch this on:</p>
+  <pre><code>SET STATISTICS IO, TIME ON;</code></pre>
+  <p>The <code>logical reads</code> per table are the most honest metric for comparing a before-and-after situation: they're independent of cache and server load. If the number of logical reads drops dramatically, your fix is a real improvement — whatever the cost percentages in the plan may claim.</p>
+
+  <blockquote><p>Need help with a stubbornly slow plan? <a href="/en/#contact">Feel free to get in touch</a> — a second opinion on an execution plan is quickly given.</p></blockquote>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="sql-tip"><span class="lbl">-- SQL tip of the day:</span> <span id="sql-tip-text"></span></div>
+    <div class="footer-row">
+      <span>© <span id="year">2026</span> Ronald de Groot · <a href="https://www.opendata.nl" rel="noopener">OpenData.nl</a></span>
+      <nav>
+        <a href="/en/blog/">SQL Tips</a>
+        <a href="/nl/blog/executieplannen-lezen.html" data-lang="nl">Nederlands</a>
+        <a href="/en/#contact">Contact</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

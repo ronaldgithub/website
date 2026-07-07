@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQL Tips — Ronald de Groot</title>
+<meta name="description" content="Praktische artikelen over SQL Server: executieplannen, index tuning, performance en Azure SQL. Door Ronald de Groot, senior (Azure) SQL Server DBA.">
+<link rel="canonical" href="https://dbaronald.com/nl/blog/">
+<link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/">
+<link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="stylesheet" href="/assets/css/style.css">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SQL Tips — Ronald de Groot">
+<meta property="og:description" content="Praktische artikelen over SQL Server: executieplannen, index tuning, performance en Azure SQL.">
+<meta property="og:url" content="https://dbaronald.com/nl/blog/">
+<meta property="og:image" content="https://dbaronald.com/assets/img/ronald.jpg">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/nl/"><span class="prompt">ronald@dbaronald</span>:~$<span class="cursor"></span></a>
+    <nav class="site-nav" id="nav">
+      <a href="/nl/#over">Over mij</a>
+      <a href="/nl/#skills">Skills</a>
+      <a href="/nl/#ervaring">Ervaring</a>
+      <a href="/nl/blog/">SQL Tips</a>
+      <a href="/nl/#contact">Contact</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a class="lang-switch" href="/en/blog/" data-lang="en" title="Switch to English">EN</a>
+      <button class="nav-toggle" aria-label="Menu" aria-controls="nav">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <span class="tag">/* sql tips */</span>
+      <h2>Artikelen over SQL Server uit de praktijk</h2>
+      <p class="lead">Executieplannen, indexen, performance tuning en Azure SQL — geschreven vanuit dertig jaar DBA-praktijk. Nieuwe artikelen verschijnen regelmatig.</p>
+    </div>
+    <div class="cards">
+      <a class="card" href="/nl/blog/executieplannen-lezen.html">
+        <span class="card-tag">-- performance tuning</span>
+        <h3>Executieplannen lezen: waar kijk je het eerst naar?</h3>
+        <p>Vijf checks waarmee je in de meeste plannen binnen een paar minuten de boosdoener vindt: dikke pijlen, onverwachte scans, key lookups, cardinality-afwijkingen en warnings.</p>
+        <span class="more">Lees artikel →</span>
+      </a>
+      <a class="card" href="/nl/blog/index-tuning.html">
+        <span class="card-tag">-- indexen</span>
+        <h3>Index tuning: clustered, nonclustered en included columns</h3>
+        <p>Hoe je de clustering key kiest, waarom kolomvolgorde alles is, wanneer INCLUDE loont en hoe je ongebruikte indexen opspoort en opruimt.</p>
+        <span class="more">Lees artikel →</span>
+      </a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="sql-tip"><span class="lbl">-- SQL-tip van de dag:</span> <span id="sql-tip-text"></span></div>
+    <div class="footer-row">
+      <span>© <span id="year">2026</span> Ronald de Groot · <a href="https://www.opendata.nl" rel="noopener">OpenData.nl</a></span>
+      <nav>
+        <a href="/nl/blog/">SQL Tips</a>
+        <a href="/en/blog/" data-lang="en">English</a>
+        <a href="/nl/#contact">Contact</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

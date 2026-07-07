@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://dbaronald.com/nl/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/"/>
+  </url>
+  <url>
+    <loc>https://dbaronald.com/en/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/"/>
+  </url>
+  <url>
+    <loc>https://dbaronald.com/nl/blog/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/"/>
+  </url>
+  <url>
+    <loc>https://dbaronald.com/en/blog/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/"/>
+  </url>
+  <url>
+    <loc>https://dbaronald.com/nl/blog/executieplannen-lezen.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/reading-execution-plans.html"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/executieplannen-lezen.html"/>
+  </url>
+  <url>
+    <loc>https://dbaronald.com/en/blog/reading-execution-plans.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/reading-execution-plans.html"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/executieplannen-lezen.html"/>
+  </url>
+  <url>
+    <loc>https://dbaronald.com/nl/blog/index-tuning.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/index-tuning.html"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/index-tuning.html"/>
+  </url>
+  <url>
+    <loc>https://dbaronald.com/en/blog/index-tuning.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/index-tuning.html"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/index-tuning.html"/>
+  </url>
+</urlset>

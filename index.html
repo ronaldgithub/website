@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ronald de Groot — Senior (Azure) SQL Server DBA</title>
+<meta name="robots" content="noindex">
+<link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/">
+<link rel="alternate" hreflang="en" href="https://dbaronald.com/en/">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<script>
+(function () {
+  var lang;
+  try { lang = localStorage.getItem("dbaronald-lang"); } catch (e) {}
+  if (lang !== "nl" && lang !== "en") {
+    if (location.hostname.indexOf("dbaronald.nl") !== -1) {
+      lang = "nl";
+    } else {
+      var nav = (navigator.languages || [navigator.language || "en"]).join(",").toLowerCase();
+      lang = nav.indexOf("nl") !== -1 ? "nl" : "en";
+    }
+  }
+  location.replace("/" + lang + "/");
+})();
+</script>
+<style>
+  body { background: #0a0e14; color: #dfe7f1; font-family: "Segoe UI", system-ui, sans-serif;
+         display: flex; min-height: 100vh; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+<noscript>
+  <p><a href="/nl/" style="color:#38bdf8">Nederlands</a> · <a href="/en/" style="color:#38bdf8">English</a></p>
+</noscript>
+<p><a href="/nl/" style="color:#38bdf8">Nederlands</a> &nbsp;·&nbsp; <a href="/en/" style="color:#38bdf8">English</a></p>
+</body>
+</html>
