@@ -383,6 +383,14 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); bo
 }
 .card h3 { font-size: 1.12rem; margin-bottom: 8px; }
 .card p { color: var(--muted); font-size: .93rem; }
+.card .card-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+}
 .card .more {
   display: inline-block;
   margin-top: 14px;
