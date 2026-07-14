@@ -9,7 +9,8 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
 RedirectMatch 404 ^/docs/
 
 # Repo housekeeping files — not for visitors
-RedirectMatch 404 ^/CLAUDE\.md$
+RedirectMatch 404 ^/(CLAUDE|README)\.md$
+RedirectMatch 404 ^/\.git
 
 # Sensible caching for static assets
 <IfModule mod_expires.c>
