@@ -8,6 +8,9 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
 # Keep the private docs folder out of the web root, should it ever get deployed
 RedirectMatch 404 ^/docs/
 
+# Repo housekeeping files — not for visitors
+RedirectMatch 404 ^/CLAUDE\.md$
+
 # Sensible caching for static assets
 <IfModule mod_expires.c>
   ExpiresActive On
