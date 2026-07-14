@@ -33,7 +33,7 @@ python -m http.server 8123
 3. Add a card in `nl/blog/index.html` **and** `en/blog/index.html` (and optionally the homepage `#blog` sections).
 4. Add both URLs to `sitemap.xml`, commit, push.
 
-Some posts live on a separate blog at `dbaronald.nl/<slug>/` (despite the README describing dbaronald.nl as an alias of this site); those get a card here linking out (with `target="_blank" rel="noopener"`) rather than a local page.
+Some posts live on a separate blog at `dbaronald.nl/<slug>/` (WordPress + Blocksy theme, despite the README describing dbaronald.nl as an alias of this site); those get a card here linking out (with `target="_blank" rel="noopener"`) rather than a local page. That blog's dark styling is maintained in `wordpress/blocksy-dark.css` — after editing it, paste the full contents into dbaronald.nl's wp-admin → Appearance → Customize → Additional CSS.
 
 ## Privacy rule
 

@@ -1,0 +1,125 @@
+/* ============================================================
+   dbaronald.nl (WordPress / Blocksy) — dark "DBA console" skin
+   Matches dbaronald.com (assets/css/style.css).
+   Apply via: wp-admin → Appearance → Customize → Additional CSS.
+   Remove that snippet to restore the original light look.
+   ============================================================ */
+
+/* ---------- Blocksy palette override (does most of the work) ---------- */
+:root {
+  --theme-palette-color-1: #38bdf8; /* accent: links, buttons */
+  --theme-palette-color-2: #22d3ee; /* accent hover */
+  --theme-palette-color-3: #dfe7f1; /* body text */
+  --theme-palette-color-4: #dfe7f1; /* headings */
+  --theme-palette-color-5: #223047; /* borders / subtle lines */
+  --theme-palette-color-6: #121927; /* panels / cards */
+  --theme-palette-color-7: #0e1420; /* alternate background */
+  --theme-palette-color-8: #0a0e14; /* site background */
+
+  /* Blocksy named variables that default to the palette on some versions */
+  --theme-text-color: #dfe7f1;
+  --theme-headings-color: #dfe7f1;
+  --theme-link-initial-color: #38bdf8;
+  --theme-link-hover-color: #22d3ee;
+  --theme-border-color: #223047;
+}
+
+/* ---------- base ---------- */
+body {
+  background: #0a0e14;
+  color: #dfe7f1;
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
+
+::selection { background: rgba(56, 189, 248, .3); }
+
+a { color: #38bdf8; }
+a:hover { color: #22d3ee; }
+
+/* ---------- header & footer ---------- */
+header[data-header*="type"] [data-row],
+.ct-header [data-row],
+.site-header {
+  background: #0e1420;
+  border-bottom: 1px solid #223047;
+}
+
+.ct-header .site-title a,
+.ct-header [data-id="menu"] a { color: #dfe7f1; }
+.ct-header [data-id="menu"] a:hover { color: #38bdf8; }
+
+.ct-footer, footer.ct-footer [data-row] {
+  background: #0e1420;
+  border-top: 1px solid #223047;
+  color: #93a1b5;
+}
+
+/* ---------- content ---------- */
+.entry-meta, .ct-meta-element, .entry-meta a { color: #93a1b5; }
+
+article .entry-title a { color: #dfe7f1; }
+article .entry-title a:hover { color: #38bdf8; }
+
+/* post cards / archive listing */
+.entry-card, .ct-related-posts .related-entry-card {
+  background: #121927;
+  border: 1px solid #223047;
+  border-radius: 10px;
+}
+
+/* ---------- code — the DBA's bread and butter ---------- */
+code, kbd, samp {
+  font-family: "Cascadia Code", Consolas, "SF Mono", Menlo, monospace;
+  color: #22d3ee;
+  background: #121927;
+  border-radius: 4px;
+  padding: .1em .35em;
+}
+
+pre, .wp-block-code, .wp-block-preformatted {
+  font-family: "Cascadia Code", Consolas, "SF Mono", Menlo, monospace;
+  background: #121927 !important;
+  color: #dfe7f1;
+  border: 1px solid #223047;
+  border-radius: 10px;
+  padding: 16px;
+  overflow-x: auto;
+}
+
+pre code { background: none; color: inherit; padding: 0; }
+
+blockquote, .wp-block-quote {
+  border-left: 3px solid #38bdf8;
+  background: #0e1420;
+  color: #93a1b5;
+}
+
+/* tables (query results!) */
+table th { background: #121927; color: #dfe7f1; }
+table td, table th { border-color: #223047; }
+
+/* ---------- buttons & forms ---------- */
+.ct-button, button, input[type="submit"], .wp-block-button__link {
+  background: #38bdf8;
+  color: #04121d;
+  border-radius: 8px;
+}
+.ct-button:hover, button:hover, input[type="submit"]:hover,
+.wp-block-button__link:hover { background: #22d3ee; color: #04121d; }
+
+input[type="text"], input[type="email"], input[type="url"],
+input[type="search"], textarea, select {
+  background: #121927;
+  color: #dfe7f1;
+  border: 1px solid #223047;
+  border-radius: 8px;
+}
+input:focus, textarea:focus, select:focus { border-color: #38bdf8; }
+
+/* ---------- widgets / sidebar ---------- */
+.ct-sidebar .ct-widget, .widget {
+  background: #121927;
+  border: 1px solid #223047;
+  border-radius: 10px;
+}
+.ct-sidebar .widget-title, .widget-title { color: #dfe7f1; }
