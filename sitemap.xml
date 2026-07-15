@@ -51,4 +51,14 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/parameter-sniffing.html"/>
     <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/parameter-sniffing.html"/>
   </url>
+  <url>
+    <loc>https://dbaronald.com/nl/blog/craig-freedman-serie.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/craig-freedman-series.html"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/craig-freedman-serie.html"/>
+  </url>
+  <url>
+    <loc>https://dbaronald.com/en/blog/craig-freedman-series.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/craig-freedman-series.html"/>
+    <xhtml:link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/craig-freedman-serie.html"/>
+  </url>
 </urlset>

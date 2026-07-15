@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Craig Freedman herlezen: de queryprocessor-blog die na twintig jaar nog klopt — Ronald de Groot</title>
+<meta name="description" content="Een leeswijzer bij mijn tiendelige serie over Craig Freedmans klassieke SQL Server query processing-blog (2006–2010): elk concept opnieuw getest op moderne SQL Server-versies, met echte executieplannen.">
+<link rel="canonical" href="https://dbaronald.com/nl/blog/craig-freedman-serie.html">
+<link rel="alternate" hreflang="nl" href="https://dbaronald.com/nl/blog/craig-freedman-serie.html">
+<link rel="alternate" hreflang="en" href="https://dbaronald.com/en/blog/craig-freedman-series.html">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="stylesheet" href="/assets/css/style.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Craig Freedman herlezen: de queryprocessor-blog die na twintig jaar nog klopt">
+<meta property="og:description" content="Tien artikelen die Craig Freedmans klassieke query processing-serie opnieuw testen op moderne SQL Server — met echte executieplannen. Dit is de leeswijzer.">
+<meta property="og:url" content="https://dbaronald.com/nl/blog/craig-freedman-serie.html">
+<meta property="og:image" content="https://dbaronald.com/assets/img/ronald.jpg">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/nl/"><span class="prompt">ronald@dbaronald</span>:~$<span class="cursor"></span></a>
+    <nav class="site-nav" id="nav">
+      <a href="/nl/#over">Over mij</a>
+      <a href="/nl/#skills">Skills</a>
+      <a href="/nl/#ervaring">Ervaring</a>
+      <a href="/nl/blog/">SQL Tips</a>
+      <a href="/nl/#contact">Contact</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a class="lang-switch" href="/en/blog/craig-freedman-series.html" data-lang="en" title="Read in English">EN</a>
+      <button class="nav-toggle" aria-label="Menu" aria-controls="nav">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<article class="article">
+  <a class="back" href="/nl/blog/">← Alle SQL tips</a>
+  <h1>Craig Freedman herlezen: de queryprocessor-blog die na twintig jaar nog klopt</h1>
+  <p class="meta">-- query processing · serie van 10 · Ronald de Groot</p>
+
+  <p>Tussen 2006 en 2010 schreef Craig Freedman — destijds ontwikkelaar in het SQL Server Query Optimizer-team van Microsoft — de misschien wel beste reeks blogposts die er ooit over queryverwerking is verschenen. Geen marketingpraat, maar iemand die de optimizer van binnenuit kende en post voor post uitlegde <em>waarom</em> SQL Server doet wat het doet: hoe iterators samenwerken, waarom een hash join soms wint van een merge join, wat er écht gebeurt bij parallellisme.</p>
+
+  <p>De blog is inmiddels alleen nog als archief op learn.microsoft.com te vinden, en dat is zonde. Daarom heb ik de complete serie herlezen — en belangrijker: <strong>elk concept opnieuw getest op moderne SQL Server-versies, met echte executieplannen</strong>. De uitkomst na tien artikelen: vrijwel alles staat nog overeind. De queryprocessor die Freedman in 2006 beschreef, is in de kern dezelfde die vandaag jouw plannen bouwt. Wie zijn serie begrijpt, leest élk executieplan met andere ogen.</p>
+
+  <p>Hieronder de leeswijzer bij alle tien delen. Ben je nieuw in executieplannen: begin gewoon bij deel 1, de serie is bewust chronologisch opgebouwd. Zoek je een specifiek onderwerp — joins, parallellisme, isolation levels — spring dan direct naar het deel dat erover gaat. (Alle artikelen zijn Engelstalig.)</p>
+
+  <h2>2006: de fundamenten, van iterator tot parallellisme</h2>
+  <ol>
+    <li><a href="https://dbaronald.nl/craig-freedmans-query-processing-series-june-2006-the-foundations/" rel="noopener" target="_blank">Juni 2006: The Foundations</a> — Het mentale model waar alles op rust: de iterator-boom, plannen lezen (grafisch, tekst, XML), scans versus seeks en de beruchte bookmark lookup. Verplichte kost.</li>
+    <li><a href="https://dbaronald.nl/craig-freedmans-query-processing-series-july-2006-from-indexes-to-joins/" rel="noopener" target="_blank">Juli 2006: From Indexes to Joins</a> — Van indexgebruik naar de eerste join: hoe de nested loops join werkt en wanneer de optimizer ervoor kiest.</li>
+    <li><a href="https://dbaronald.nl/craig-freedmans-query-processing-series-august-2006-merge-join-hash-join-and-subqueries/" rel="noopener" target="_blank">Augustus 2006: Merge Join, Hash Join and Subqueries</a> — De andere twee join-operators, hun geheugengedrag, en hoe subqueries onder de motorkap tot joins worden herschreven.</li>
+    <li><a href="https://dbaronald.nl/craig-freedmans-query-processing-series-september-2006-aggregation/" rel="noopener" target="_blank">September 2006: Aggregation</a> — Stream aggregate versus hash aggregate: waarom sortering het verschil maakt en wat dat betekent voor GROUP BY en DISTINCT.</li>
+    <li><a href="https://dbaronald.nl/craig-freedmans-query-processing-series-october-2006-decorrelation-index-union-and-the-exchange-operator/" rel="noopener" target="_blank">Oktober 2006: Decorrelation, Index Union and the Exchange Operator</a> — De optimizer als herschrijver: gecorreleerde subqueries ontvlochten, meerdere indexen gecombineerd, en de exchange-operator die parallellisme mogelijk maakt.</li>
+    <li><a href="https://dbaronald.nl/craig-freedmans-query-processing-series-november-2006-parallel-scans-parallel-joins-and-partitioned-tables/" rel="noopener" target="_blank">November 2006: Parallel Scans, Parallel Joins and Partitioned Tables</a> — Hoe SQL Server werk over threads verdeelt: parallelle scans en joins, en de wisselwerking met gepartitioneerde tabellen.</li>
+    <li><a href="https://dbaronald.nl/craig-freedmans-query-processing-series-december-2006-the-semi-join-transformation/" rel="noopener" target="_blank">December 2006: The Semi-join Transformation</a> — Eén transformatie uitgediept: hoe EXISTS en IN als semi-join worden uitgevoerd en waarom dat sneller is dan je eigen omweg.</li>
+  </ol>
+
+  <h2>2007–2010: van isolation levels tot de slotposts</h2>
+  <ol start="8">
+    <li><a href="https://dbaronald.nl/craig-freedmans-query-processing-series-2007-isolation-levels-pivot-top-index-maintenance-and-ctes/" rel="noopener" target="_blank">2007: Isolation Levels, PIVOT, TOP, Index Maintenance and CTEs</a> — Het breedste jaar: wat isolation levels werkelijk garanderen, hoe PIVOT en TOP in het plan belanden, index-onderhoud en recursieve CTE's.</li>
+    <li><a href="https://dbaronald.nl/craig-freedmans-query-processing-series-2008-ranking-functions-conversions-partitioning-and-i-o/" rel="noopener" target="_blank">2008: Ranking Functions, Conversions, Partitioning and I/O</a> — ROW_NUMBER en vrienden in het plan, de valkuilen van impliciete conversies, partitioning en hoe I/O een query maakt of breekt.</li>
+    <li><a href="https://dbaronald.nl/craig-freedmans-query-processing-series-2009-2010-i-o-by-sorting-hint-pitfalls-and-the-final-posts/" rel="noopener" target="_blank">2009–2010: I/O by Sorting, Hint Pitfalls and the Final Posts</a> — Het slotakkoord: random I/O temmen door te sorteren, waarom hints vaker kwaad dan goed doen, en de laatste posts van een serie die het herlezen meer dan waard bleek.</li>
+  </ol>
+
+  <h2>Waarom dit nog steeds relevant is</h2>
+  <p>SQL Server heeft er sinds 2010 veel bij gekregen — columnstore, batch mode, Intelligent Query Processing, Azure SQL — maar de row-mode-operators waar Freedman over schreef zitten nog steeds in negen van de tien plannen die ik als DBA onder ogen krijg. Een nested loops join werkt in SQL Server 2025 nog precies zoals hij in 2006 werkte. Dat is precies wat deze serie zo waardevol maakt: het is geen versie-kennis die veroudert, maar fundament-kennis die blijft.</p>
+
+  <p>De volledige serie staat gebundeld op <a href="https://dbaronald.nl/category/craig-freedman/" rel="noopener" target="_blank">dbaronald.nl/category/craig-freedman</a>.</p>
+
+  <blockquote><p>Loop je in de praktijk vast op een executieplan dat je niet kunt verklaren? <a href="/nl/#contact">Ik kijk graag even mee</a>.</p></blockquote>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="sql-tip"><span class="lbl">-- SQL-tip van de dag:</span> <span id="sql-tip-text"></span></div>
+    <div class="footer-row">
+      <span>© <span id="year">2026</span> Ronald de Groot · <a href="https://www.opendata.nl" rel="noopener">OpenData.nl</a></span>
+      <nav>
+        <a href="/nl/blog/">SQL Tips</a>
+        <a href="/en/blog/craig-freedman-series.html" data-lang="en">English</a>
+        <a href="/nl/#contact">Contact</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/js/main.js"></script>
+</body>
+</html>
