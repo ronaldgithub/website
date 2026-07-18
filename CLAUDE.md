@@ -33,7 +33,7 @@ python -m http.server 8123
 3. Add a card in `nl/blog/index.html` **and** `en/blog/index.html` (and optionally the homepage `#blog` sections).
 4. Add both URLs to `sitemap.xml`, commit, push.
 
-Some posts live on the separate WordPress blog at `dbaronald.nl/<slug>/` (Blocksy theme); those get a card here linking out (with `target="_blank" rel="noopener"`) rather than a local page — added to both blog overviews and both homepage `#blog` sections, no `sitemap.xml` entry. Move the "nieuw"/"new" card-tag suffix from the previous newest card to the new one, and mark the NL card "(Engelstalig)" or the EN card "(In Dutch)" when the post's language differs. That blog's dark styling is maintained in `wordpress/blocksy-dark.css` — after editing it, paste the full contents into dbaronald.nl's wp-admin → Appearance → Customize → Additional CSS.
+Some posts live on the separate WordPress blog at `dbaronald.nl/<slug>/` (Blocksy theme); those get a card here linking out (with `target="_blank" rel="noopener"`) rather than a local page — added to both blog overviews and both homepage `#blog` sections, no `sitemap.xml` entry. Move the "nieuw"/"new" card-tag suffix from the previous newest card to the new one, and mark the NL card "(Engelstalig)" or the EN card "(In Dutch)" when the post's language differs. That blog's dark styling is maintained in `wordpress/blocksy-dark.css` — after editing it, paste the full contents into dbaronald.nl's wp-admin → Appearance → Customize → Additional CSS. The matching dark canvas for the Gutenberg post editor is `wordpress/blocksy-dark-editor.php`, installed as a WPCode snippet (instructions in the file's header comment) — Additional CSS alone leaves the editor white-on-white.
 
 ## Privacy rule
 

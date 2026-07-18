@@ -48,6 +48,9 @@ From then on: `git push` = live site.
 theme) where some posts are published at `dbaronald.nl/<slug>/`. Its dark styling is
 maintained in this repo as `wordpress/blocksy-dark.css` — after editing that file, paste
 the full contents into dbaronald.nl's wp-admin → *Appearance → Customize → Additional CSS*.
+`wordpress/blocksy-dark-editor.php` darkens the Gutenberg post editor to match (the skin's
+white text otherwise sits on the editor's white canvas); it is installed as a WPCode
+snippet — see the file's header comment.
 (The language detector in `index.html` still defaults to Dutch for the dbaronald.nl
 hostname, from when the domain pointed at this site.)
 

@@ -11,6 +11,7 @@ RedirectMatch 404 ^/docs/
 # Repo housekeeping files — not for visitors
 RedirectMatch 404 ^/(CLAUDE|README)\.md$
 RedirectMatch 404 ^/\.git
+RedirectMatch 404 ^/wordpress/
 
 # Sensible caching for static assets
 <IfModule mod_expires.c>
