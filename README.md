@@ -3,6 +3,10 @@
 Bilingual (NL/EN) static portfolio site for a senior (Azure) SQL Server DBA / BI consultant.
 Plain HTML/CSS/JS — no build step, no CMS. Made for Hostinger shared hosting.
 
+The companion domain **dbaronald.nl** runs a separate WordPress blog (Blocksy theme);
+this repo only holds its dark-theme CSS (see `wordpress/`). Posts published there get a
+card on this site linking out.
+
 ## Structure
 
 | Path | What it is |
@@ -12,6 +16,7 @@ Plain HTML/CSS/JS — no build step, no CMS. Made for Hostinger shared hosting.
 | `nl/blog/`, `en/blog/` | "SQL Tips" articles (plain HTML pages) |
 | `assets/` | Shared CSS, JS and images |
 | `.htaccess` | HTTPS redirect, caching, blocks `/docs/` |
+| `wordpress/` | Dark Blocksy CSS for the WordPress blog on dbaronald.nl |
 | `docs/` | **Private** (git-ignored) — CV source, never deployed |
 
 ## Local preview
@@ -37,12 +42,14 @@ Then open http://localhost:8123/ — root-relative links require serving from th
 
 From then on: `git push` = live site.
 
-### Pointing dbaronald.nl at the same site
+### The dbaronald.nl WordPress blog
 
-In hPanel: *Domains* → **dbaronald.nl** → point it to the same hosting plan (as an alias/parked
-domain on the dbaronald.com website). The site automatically serves Dutch as the default
-language on dbaronald.nl (see `index.html`). Enable the free SSL certificate for both domains
-under *Websites → SSL*.
+**dbaronald.nl** is not an alias of this site: it runs its own WordPress install (Blocksy
+theme) where some posts are published at `dbaronald.nl/<slug>/`. Its dark styling is
+maintained in this repo as `wordpress/blocksy-dark.css` — after editing that file, paste
+the full contents into dbaronald.nl's wp-admin → *Appearance → Customize → Additional CSS*.
+(The language detector in `index.html` still defaults to Dutch for the dbaronald.nl
+hostname, from when the domain pointed at this site.)
 
 ## Adding a blog article
 
@@ -52,6 +59,10 @@ under *Websites → SSL*.
 4. Add a card for it in `nl/blog/index.html` and `en/blog/index.html`.
 5. Add both URLs to `sitemap.xml`.
 6. Commit and push.
+
+Posts published on the dbaronald.nl WordPress blog instead get a card here (blog
+overviews + homepage `#blog` sections, both languages) linking out with
+`target="_blank" rel="noopener"` — no local page and no `sitemap.xml` entry.
 
 ## Privacy
 

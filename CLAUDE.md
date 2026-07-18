@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Bilingual (NL/EN) static portfolio site for Ronald de Groot, senior (Azure) SQL Server DBA — served at dbaronald.com and dbaronald.nl. Plain HTML/CSS/JS: **no build step, no framework, no package.json, no tests**. Hosted on Hostinger shared hosting (Apache/LiteSpeed).
+Bilingual (NL/EN) static portfolio site for Ronald de Groot, senior (Azure) SQL Server DBA — served at dbaronald.com. Plain HTML/CSS/JS: **no build step, no framework, no package.json, no tests**. Hosted on Hostinger shared hosting (Apache/LiteSpeed). The companion domain dbaronald.nl runs a separate WordPress blog (see "Adding a blog article").
 
 ## Commands
 
@@ -33,7 +33,7 @@ python -m http.server 8123
 3. Add a card in `nl/blog/index.html` **and** `en/blog/index.html` (and optionally the homepage `#blog` sections).
 4. Add both URLs to `sitemap.xml`, commit, push.
 
-Some posts live on a separate blog at `dbaronald.nl/<slug>/` (WordPress + Blocksy theme, despite the README describing dbaronald.nl as an alias of this site); those get a card here linking out (with `target="_blank" rel="noopener"`) rather than a local page. That blog's dark styling is maintained in `wordpress/blocksy-dark.css` — after editing it, paste the full contents into dbaronald.nl's wp-admin → Appearance → Customize → Additional CSS.
+Some posts live on the separate WordPress blog at `dbaronald.nl/<slug>/` (Blocksy theme); those get a card here linking out (with `target="_blank" rel="noopener"`) rather than a local page — added to both blog overviews and both homepage `#blog` sections, no `sitemap.xml` entry. Move the "nieuw"/"new" card-tag suffix from the previous newest card to the new one, and mark the NL card "(Engelstalig)" or the EN card "(In Dutch)" when the post's language differs. That blog's dark styling is maintained in `wordpress/blocksy-dark.css` — after editing it, paste the full contents into dbaronald.nl's wp-admin → Appearance → Customize → Additional CSS.
 
 ## Privacy rule
 
