@@ -44,8 +44,14 @@
       <p class="lead">Execution plans, indexes, performance tuning and Azure SQL — written from thirty years of hands-on DBA practice. New articles appear regularly.</p>
     </div>
     <div class="cards">
+      <a class="card" href="https://dbaronald.nl/join-order-build-probe-outer-inner-physical-operator-selection/" rel="noopener" target="_blank">
+        <span class="card-tag">-- join order · execution plans · new</span>
+        <h3>Why Join Order Can Make or Break Your Query Performance</h3>
+        <p>Seven variations of the same query on StackOverflow2013, differing only in join order and physical operator — one forces a 2.46M-row hash build, another burns 87% of its runtime on nested-loop iterations, all because the wrong side became the build/outer input.</p>
+        <span class="more">Read on dbaronald.nl →</span>
+      </a>
       <a class="card" href="https://dbaronald.nl/ai-and-where-does-query-time-go-using-claude-query-plan-analysis-skill/" rel="noopener" target="_blank">
-        <span class="card-tag">-- query plan · ai · new</span>
+        <span class="card-tag">-- query plan · ai</span>
         <h3>AI and Where Does Query Time Go? Using Claude's Query Plan Analysis Skill</h3>
         <p>A scalar function hides where a query's time actually goes — Claude's execution-plan-analysis skill flags it, inlining with STRING_AGG and a composite index take it from slow to fast, with sp_BlitzCache and Performance Studio confirming the win.</p>
         <span class="more">Read on dbaronald.nl →</span>
