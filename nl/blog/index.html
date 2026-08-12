@@ -44,8 +44,14 @@
       <p class="lead">Executieplannen, indexen, performance tuning en Azure SQL — geschreven vanuit dertig jaar DBA-praktijk. Nieuwe artikelen verschijnen regelmatig.</p>
     </div>
     <div class="cards">
+      <a class="card" href="https://dbaronald.nl/table-variables-versus-temp-tables/" rel="noopener" target="_blank">
+        <span class="card-tag">-- table variables · temp tables · nieuw</span>
+        <h3>Table Variables versus #Temp Tables</h3>
+        <p>Tabelvariabelen hebben geen statistieken? Een veelgehoorde aanname — maar op recente SQL Server-versies kunnen geïndexeerde tabelvariabelen wél degelijke statistieken hebben, zichtbaar in het executieplan. Vertrouw het plan, niet de vuistregel. (Engelstalig)</p>
+        <span class="more">Lees op dbaronald.nl →</span>
+      </a>
       <a class="card" href="https://dbaronald.nl/you-want-to-partition-your-huge-table-ok-fine-lets-go/" rel="noopener" target="_blank">
-        <span class="card-tag">-- partitioning · index maintenance · nieuw</span>
+        <span class="card-tag">-- partitioning · index maintenance</span>
         <h3>You Want to Partition Your Huge Table.. Ok Fine.. Let's Go.</h3>
         <p>Een bestaande, enorme tabel partitioneren zonder size-of-data operatie: een lege partition function, twee metadata-only SWITCH-operaties rond een clustered index rebuild, en daarna stapsgewijze SPLIT RANGE-calls die seeken in plaats van scannen — Michael J. Swarts techniek in de praktijk. (Engelstalig)</p>
         <span class="more">Lees op dbaronald.nl →</span>

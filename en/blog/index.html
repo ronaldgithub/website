@@ -44,8 +44,14 @@
       <p class="lead">Execution plans, indexes, performance tuning and Azure SQL — written from thirty years of hands-on DBA practice. New articles appear regularly.</p>
     </div>
     <div class="cards">
+      <a class="card" href="https://dbaronald.nl/table-variables-versus-temp-tables/" rel="noopener" target="_blank">
+        <span class="card-tag">-- table variables · temp tables · new</span>
+        <h3>Table Variables versus #Temp Tables</h3>
+        <p>Table variables have no statistics? A common assumption — but on recent SQL Server versions, indexed table variables can carry real statistics too, visible right in the execution plan. Trust the plan, not the rule of thumb.</p>
+        <span class="more">Read on dbaronald.nl →</span>
+      </a>
       <a class="card" href="https://dbaronald.nl/you-want-to-partition-your-huge-table-ok-fine-lets-go/" rel="noopener" target="_blank">
-        <span class="card-tag">-- partitioning · index maintenance · new</span>
+        <span class="card-tag">-- partitioning · index maintenance</span>
         <h3>You Want to Partition Your Huge Table.. Ok Fine.. Let's Go.</h3>
         <p>Partitioning an existing huge table without a size-of-data operation: an empty partition function, two metadata-only SWITCH operations around a clustered index rebuild, then incremental SPLIT RANGE calls that seek instead of scan — Michael J. Swart's technique applied end to end.</p>
         <span class="more">Read on dbaronald.nl →</span>
