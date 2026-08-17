@@ -79,9 +79,19 @@ code, pre, .mono { font-family: var(--mono); }
 }
 @keyframes blink { 50% { opacity: 0; } }
 
-.site-nav { display: flex; align-items: center; gap: 22px; }
-.site-nav a { color: var(--muted); font-size: .95rem; }
+.site-nav { display: flex; align-items: center; gap: 18px; }
+.site-nav a {
+  font-family: var(--mono);
+  font-size: .8rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 4px 1px;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+}
 .site-nav a:hover { color: var(--text); text-decoration: none; }
+.site-nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
 
 .lang-switch {
   font-family: var(--mono);
@@ -286,25 +296,35 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); bo
 }
 .skill-bar.in-view i { width: var(--w); }
 
-/* ---------- cert badges ---------- */
-.badges {
-  margin-top: 46px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-}
-.badge-card {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  background: var(--panel);
+/* ---------- pill badge (shared: clients cloud / certifications) ---------- */
+.pill,
+.clients-cloud .tags span {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: .8rem;
+  color: var(--muted);
+  background: var(--panel-2);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 22px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
 }
-.badge-card svg { flex: 0 0 46px; }
-.badge-card h3 { font-size: 1.02rem; margin-bottom: 3px; }
-.badge-card p { color: var(--muted); font-size: .9rem; }
+.pill-accent { color: var(--accent); border-color: rgba(56, 189, 248, .4); background: rgba(56, 189, 248, .08); }
+.pill-amber  { color: var(--amber);  border-color: rgba(251, 191, 36, .4); background: rgba(251, 191, 36, .08); }
+
+/* ---------- certifications ---------- */
+.cert-list { list-style: none; }
+.cert-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.cert-row:last-child { border-bottom: 0; }
+.cert-row .pill { flex: 0 0 auto; margin-top: 3px; }
+.cert-row-text h3 { font-size: 1.02rem; margin-bottom: 3px; }
+.cert-row-text p { color: var(--muted); font-size: .9rem; }
 
 /* ---------- timeline ---------- */
 .timeline {
@@ -344,15 +364,6 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); bo
 }
 .clients-cloud h3 { font-size: 1rem; margin-bottom: 14px; color: var(--muted); }
 .clients-cloud .tags { display: flex; flex-wrap: wrap; gap: 8px; }
-.clients-cloud .tags span {
-  font-family: var(--mono);
-  font-size: .8rem;
-  color: var(--muted);
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  padding: 4px 10px;
-  border-radius: 999px;
-}
 
 /* ---------- blog cards ---------- */
 .cards {
@@ -537,7 +548,7 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); bo
   section { padding: 54px 0; }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 760px) {
   .site-nav {
     position: absolute;
     top: 62px; left: 0; right: 0;

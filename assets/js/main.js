@@ -27,6 +27,28 @@
     });
   }
 
+  /* ---------- scrollspy: active nav tab ---------- */
+  var navLinks = document.querySelectorAll(".site-nav a[href*='#']");
+  var sectionMap = {};
+  navLinks.forEach(function (a) {
+    var href = a.getAttribute("href") || "";
+    var hashIndex = href.indexOf("#");
+    if (hashIndex === -1) return;
+    var section = document.getElementById(href.slice(hashIndex + 1));
+    if (section) sectionMap[section.id] = a;
+  });
+  var spySections = Object.keys(sectionMap).map(function (id) { return document.getElementById(id); });
+  if ("IntersectionObserver" in window && spySections.length) {
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        navLinks.forEach(function (a) { a.classList.remove("active"); });
+        sectionMap[entry.target.id].classList.add("active");
+      });
+    }, { rootMargin: "-64px 0px -70% 0px", threshold: 0 });
+    spySections.forEach(function (s) { spy.observe(s); });
+  }
+
   /* ---------- reveal on scroll + skill bars ---------- */
   var observed = document.querySelectorAll(".reveal, .skill-bar");
   if ("IntersectionObserver" in window && observed.length) {
