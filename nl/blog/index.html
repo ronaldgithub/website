@@ -44,8 +44,14 @@
       <p class="lead">Executieplannen, indexen, performance tuning en Azure SQL — geschreven vanuit dertig jaar DBA-praktijk. Nieuwe artikelen verschijnen regelmatig.</p>
     </div>
     <div class="cards">
+      <a class="card" href="https://dbaronald.nl/parameter-sensitive-plans-psp-versus-parameter-sniffing/" rel="noopener" target="_blank">
+        <span class="card-tag">-- parameter sniffing · PSP · nieuw</span>
+        <h3>Parameter Sensitive Plans (PSP) versus Parameter Sniffing</h3>
+        <p>SQL Server 2022's Parameter Sensitive Plans vervangen het ene gecachete plan door een dispatcher plus maximaal drie planvarianten, ingedeeld op cardinaliteit van de parameter. Getest op Posts.ParentId in de StackOverflow-database — een kolom waar enkele waarden duizenden matches hebben en de meeste bijna nul — krijgen de zeldzame en veelvoorkomende gevallen elk hun eigen plan, herkenbaar aan predicate_range- en QueryVariantID-markeringen in het executieplan. (Engelstalig)</p>
+        <span class="more">Lees op dbaronald.nl →</span>
+      </a>
       <a class="card" href="https://dbaronald.nl/execution-plans-of-all-string-functions/" rel="noopener" target="_blank">
-        <span class="card-tag">-- string functions · execution plans · nieuw</span>
+        <span class="card-tag">-- string functions · execution plans</span>
         <h3>Execution Plans of all String Functions</h3>
         <p>Drieëndertig T-SQL stringfuncties — van ASCII tot UPPER — stuk voor stuk getest tegen de StackOverflow2010-database, met een gecorreleerde scalaire subquery die de cost-schatting van de optimizer net over de parallellism-drempel duwt zodat parallelle plannen zichtbaar worden. Voor elke functie het bijbehorende executieplan. (Engelstalig)</p>
         <span class="more">Lees op dbaronald.nl →</span>
