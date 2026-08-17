@@ -296,6 +296,10 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); bo
 }
 .skill-bar.in-view i { width: var(--w); }
 
+.skill-photo { margin-top: 40px; max-width: 420px; }
+.skill-photo img { width: 100%; display: block; border-radius: var(--radius); border: 1px solid var(--border); }
+.skill-photo figcaption { margin-top: 10px; font-size: .88rem; color: var(--muted); }
+
 /* ---------- pill badge (shared: clients cloud / certifications) ---------- */
 .pill,
 .clients-cloud .tags span {
