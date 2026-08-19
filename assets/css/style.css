@@ -430,6 +430,7 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); bo
   margin-bottom: 10px;
 }
 .card-tool-head .card-tag { margin-bottom: 0; }
+.card-tool-head .pill-accent { background: rgba(56, 189, 248, .18); }
 
 /* ---------- github repos ---------- */
 #gh-repos .card h3 { font-family: var(--mono); font-size: 1rem; color: var(--accent); }
