@@ -45,6 +45,36 @@ A free community tool at `dbaronald.nl/statistics-parser/`: paste `SET STATISTIC
 - Abuse protection on the email path: a WP nonce, a 5-emails/hour-per-IP rate limit (`get_transient`/`set_transient`), and Cloudflare Turnstile (the real bot gate — the nonce alone doesn't stop a scripted attacker). Turnstile needs two secrets set in `wp-config.php` (never in this repo): `DBARONALD_TURNSTILE_SITE_KEY` and `DBARONALD_TURNSTILE_SECRET_KEY` — see the header comment in `stats-parser-handler.php` for where to get them. Known accepted risk: the endpoint will email whatever address is typed in, not necessarily the submitter's own — mitigated by rate limiting, not eliminated.
 - To create the live page: paste `stats-parser-handler.php` into a WPCode PHP snippet, then create a WP Page whose entire content is the shortcode `[dbaronald_stats_parser]`, then add it to the site nav via Appearance → Menus.
 
+## Adding the execution plan submission form
+
+A **private** page (never linked in any nav/card — share the URL directly) for
+known consulting clients at a wp-admin-chosen slug on dbaronald.nl: they
+upload a `.sqlplan` file, it gets emailed straight to
+`ronald.de.groot@opendata.nl`, which lands in the existing Power Automate →
+OneDrive → SQLPerformanceViewer intake pipeline (see the
+`execution-plan-intake-pipeline` memory) exactly like a direct email
+attachment would. Unlike Statistics Parser, **nothing here analyzes
+anything** — analysis stays fully manual in SQLPerformanceViewer, and the
+reply with a results link is sent by Ronald himself. Same two-path structure
+as Statistics Parser:
+
+- `assets/js/plan-submit.js` — form wiring only (no rule engine to speak of),
+  deploys via the normal git-push pipeline, loaded cross-origin from
+  `https://dbaronald.com/assets/js/plan-submit.js`.
+- `wordpress/plan-submit-page.html` — local test harness only.
+- `wordpress/plan-submit-handler.php` — the real thing: WPCode "Run
+  Everywhere" PHP snippet registering the `[dbaronald_plan_submit]` shortcode
+  (fresh nonce per view, same reasoning as Statistics Parser) and the
+  `wp_ajax_dbaronald_plan_submit_email` handler, which validates the upload
+  (extension, ≤8MB, and a real showplan-XML-namespace check via
+  `DOMDocument`) and forwards it with `wp_mail()`'s `$attachments` param —
+  with `Reply-To` set to the client's own address so replying in Outlook goes
+  straight back to them even though WordPress sent the email.
+- No Turnstile here (unlike Statistics Parser) — the destination address is
+  hardcoded to Ronald's own inbox, so there's no email-relay-to-a-stranger
+  abuse vector, just a plain nonce + 10-submissions/hour-per-IP rate limit as
+  a backstop.
+
 ## Privacy rule
 
 The public site deliberately shows **no home address or phone number** — contact is via email, LinkedIn and GitHub only. Never add personal contact details to any page.
