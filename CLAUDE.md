@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Bilingual (NL/EN) static portfolio site for Ronald de Groot, senior (Azure) SQL Server DBA — served at dbaronald.com. Plain HTML/CSS/JS: **no build step, no framework, no package.json, no tests**. Hosted on Hostinger shared hosting (Apache/LiteSpeed). The companion domain dbaronald.nl runs a separate WordPress blog (see "Adding a blog article").
+Bilingual (NL/EN) static portfolio site for Ronald de Groot, senior (Azure) SQL Server DBA — served at dbaronald.com. Plain HTML/CSS/JS: **no build step, no framework, no package.json, no tests**. Hosted on Hostinger shared hosting (Apache/LiteSpeed). The companion domain dbaronald.nl runs a separate WordPress blog (see "Adding a blog article") and, since 2026-08-19, two interactive PHP-backed features hand-installed as WPCode snippets: a public **Statistics Parser** community tool and a private **execution plan submission form** (see their respective sections below) — both share their client-side JS engines with this static repo but are otherwise entirely outside the normal git-deploy pipeline.
 
 ## Commands
 
@@ -73,7 +73,20 @@ as Statistics Parser:
 - No Turnstile here (unlike Statistics Parser) — the destination address is
   hardcoded to Ronald's own inbox, so there's no email-relay-to-a-stranger
   abuse vector, just a plain nonce + 10-submissions/hour-per-IP rate limit as
-  a backstop.
+  a backstop. **Note:** Ronald's stated preference (2026-08-19, see the
+  `feedback-default-to-abuse-protection` memory) is to default new
+  internet-facing forms to abuse-resistant rather than reasoning per-feature
+  about whether a specific vector applies — this endpoint predates that
+  feedback and may be worth revisiting.
+
+**Known issue (both email-sending features above):** `wp_mail()` on this
+Hostinger/WordPress install is unreliable — Statistics Parser's report email
+has landed in spam, and a plan-submit test reported success but the email
+never arrived anywhere (not even spam), consistent with PHP's bare `mail()`
+fire-and-forget behavior with no SPF/DKIM. Fix in progress: WP Mail SMTP +
+Microsoft 365 OAuth (paused mid-Azure-app-registration as of 2026-08-19) —
+full status in the `execution-plan-intake-pipeline` memory. Don't trust
+`wp_mail()`'s return value as proof of delivery until that's resolved.
 
 ## Privacy rule
 

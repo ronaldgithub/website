@@ -4,8 +4,11 @@ Bilingual (NL/EN) static portfolio site for a senior (Azure) SQL Server DBA / BI
 Plain HTML/CSS/JS — no build step, no CMS. Made for Hostinger shared hosting.
 
 The companion domain **dbaronald.nl** runs a separate WordPress blog (Blocksy theme);
-this repo only holds its dark-theme CSS (see `wordpress/`). Posts published there get a
-card on this site linking out.
+this repo holds its dark-theme CSS plus two interactive PHP-backed features hand-installed
+there as WPCode snippets (see `wordpress/`) — a public **Statistics Parser** tool and a
+private execution-plan submission form. Their client-side engines (`assets/js/stats-parser.js`,
+`assets/js/plan-submit.js`) deploy through this repo's normal pipeline; the PHP/WordPress
+side does not. Posts published on the blog get a card on this site linking out.
 
 ## Structure
 
@@ -16,7 +19,7 @@ card on this site linking out.
 | `nl/blog/`, `en/blog/` | "SQL Tips" articles (plain HTML pages) |
 | `assets/` | Shared CSS, JS and images |
 | `.htaccess` | HTTPS redirect, caching, blocks `/docs/` |
-| `wordpress/` | Dark Blocksy CSS for the WordPress blog on dbaronald.nl |
+| `wordpress/` | Dark Blocksy CSS + hand-pasted WPCode snippets for dbaronald.nl (blog theme, Statistics Parser, plan submission form) |
 | `docs/` | **Private** (git-ignored) — CV source, never deployed |
 
 ## Local preview
@@ -66,6 +69,23 @@ hostname, from when the domain pointed at this site.)
 Posts published on the dbaronald.nl WordPress blog instead get a card here (blog
 overviews + homepage `#blog` sections, both languages) linking out with
 `target="_blank" rel="noopener"` — no local page and no `sitemap.xml` entry.
+
+## Community tools on dbaronald.nl
+
+Two features live on the WordPress side, each with a client-side engine
+deployed from this repo (`assets/js/`) and a WPCode PHP snippet pasted
+directly into wp-admin (`wordpress/`, never auto-deployed — see CLAUDE.md's
+"Adding the Statistics Parser tool" / "Adding the execution plan submission
+form" sections for exact install steps):
+
+- **Statistics Parser** (`dbaronald.nl/statistics-parser/`) — public, paste
+  `SET STATISTICS IO/TIME` output, get instant client-side suggestions.
+- **Execution plan submission form** — private, unlinked, emails an uploaded
+  `.sqlplan` file to Ronald for manual review.
+
+Known issue as of 2026-08-19: outgoing `wp_mail()` on this WordPress install
+is unreliable (lands in spam, or occasionally doesn't arrive at all) — a fix
+via WP Mail SMTP is in progress.
 
 ## Privacy
 
