@@ -1,0 +1,132 @@
+<!--
+  dbaronald.nl — Statistics Parser page template / local test harness.
+
+  This file is what stats-parser-handler.php's [dbaronald_stats_parser]
+  shortcode renders on the live site (with a real WP nonce + admin-ajax URL
+  substituted in — see that file). Kept here as a standalone copy so the
+  parsing/suggestions engine (assets/js/stats-parser.js) can be tested
+  locally with `python -m http.server 8123` from the repo root before
+  anything touches WordPress. The "Email me the full report" button will
+  fail harmlessly in this standalone copy (no real nonce/endpoint) — that's
+  expected; test the email path against a staging WordPress instead (see
+  CLAUDE.md).
+
+  stats-parser.js itself lives at assets/js/stats-parser.js — NOT under
+  wordpress/ — because it deploys automatically via the normal
+  dbaronald.com git-push pipeline (see CLAUDE.md), and the live WordPress
+  page loads it straight from https://dbaronald.com/assets/js/stats-parser.js
+  via a plain cross-origin <script src>. That avoids maintaining a second
+  copy pasted into wp-admin (script tags don't need CORS; only fetch/XHR
+  do). Only the WordPress-specific glue (shortcode markup + AJAX handler)
+  lives under wordpress/.
+
+  Install on the live site: see the header comment in
+  wordpress/stats-parser-handler.php.
+-->
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Statistics Parser — local test</title>
+<!--
+  Cloudflare Turnstile test key — always passes, never call the real
+  siteverify API from local testing. See:
+  https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+  The live site uses a real key from the Cloudflare dashboard instead —
+  see wordpress/stats-parser-handler.php.
+-->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<style>
+  body { background:#0a0e14; color:#dfe7f1; font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif; margin:0; padding:32px 16px; }
+  .stats-parser { max-width:1000px; margin:0 auto; display:grid; grid-template-columns:280px 1fr; gap:28px; }
+  @media (max-width: 720px) { .stats-parser { grid-template-columns:1fr; } }
+  .sp-panel { background:#121927; border:1px solid #223047; border-radius:10px; padding:20px; align-self:start; }
+  .sp-panel h2 { margin-top:0; font-size:1.05rem; color:#dfe7f1; }
+  .sp-panel code { font-family:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace; color:#22d3ee; background:#0e1420; border-radius:4px; padding:.1em .35em; }
+  .sp-panel pre { background:#0e1420; border:1px solid #223047; border-radius:8px; padding:12px; overflow-x:auto; font-size:.85rem; }
+  .sp-privacy { margin-top:16px; padding-top:14px; border-top:1px solid #223047; font-size:.85rem; color:#93a1b5; }
+  .sp-lang-switch { margin-bottom:16px; font-family:monospace; font-size:.85rem; }
+  .sp-lang-switch a { color:#93a1b5; text-decoration:none; padding:2px 6px; }
+  .sp-lang-switch a.active { color:#38bdf8; font-weight:bold; }
+  .sp-main { display:flex; flex-direction:column; gap:14px; }
+  .sp-input { width:100%; min-height:220px; box-sizing:border-box; background:#121927; color:#dfe7f1; border:1px solid #223047; border-radius:8px; padding:12px; font-family:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace; font-size:.85rem; resize:vertical; }
+  .sp-input:focus { border-color:#38bdf8; outline:none; }
+  .sp-actions { display:flex; gap:10px; flex-wrap:wrap; }
+  .sp-actions button { background:#38bdf8; color:#04121d; border:none; border-radius:8px; padding:9px 16px; font-size:.9rem; cursor:pointer; }
+  .sp-actions button:hover { background:#22d3ee; }
+  .sp-actions button.sp-secondary { background:transparent; color:#dfe7f1; border:1px solid #223047; }
+  .sp-actions button.sp-secondary:hover { border-color:#38bdf8; color:#38bdf8; }
+  .sp-results { min-height:20px; }
+  .sp-empty { color:#93a1b5; font-style:italic; }
+  .sp-table-wrap { overflow-x:auto; }
+  .sp-table { width:100%; border-collapse:collapse; font-size:.88rem; }
+  .sp-table th, .sp-table td { border:1px solid #223047; padding:7px 10px; text-align:right; white-space:nowrap; }
+  .sp-table th:first-child, .sp-table td:first-child { text-align:left; }
+  .sp-table th { background:#121927; color:#dfe7f1; }
+  .sp-flag-row td { color:#fbbf24; }
+  .sp-total-row td { font-weight:bold; background:#0e1420; }
+  .sp-time { color:#93a1b5; font-size:.9rem; }
+  .sp-findings-title { font-size:.95rem; margin-bottom:8px; }
+  .sp-findings { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .pill { display:inline-block; font-family:monospace; font-size:.82rem; padding:6px 12px; border-radius:8px; border:1px solid #223047; background:#121927; color:#93a1b5; }
+  .pill-accent { color:#38bdf8; border-color:rgba(56,189,248,.4); background:rgba(56,189,248,.08); }
+  .pill-amber { color:#fbbf24; border-color:rgba(251,191,36,.4); background:rgba(251,191,36,.08); }
+  .sp-email-form { display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding-top:10px; border-top:1px solid #223047; }
+  .sp-email-form input[type="email"] { background:#121927; color:#dfe7f1; border:1px solid #223047; border-radius:8px; padding:8px 12px; min-width:220px; }
+  .sp-hidden { display:none; }
+  .sp-email-status { font-size:.85rem; color:#93a1b5; }
+</style>
+</head>
+<body>
+
+<div class="stats-parser" data-lang="nl" data-ajax-url="#" data-nonce="local-test">
+
+  <aside class="sp-panel">
+    <div class="sp-lang-switch">
+      <a href="#" data-set-lang="nl" class="active">NL</a> | <a href="#" data-set-lang="en">EN</a>
+    </div>
+
+    <div data-lang-text="nl">
+      <h2>Statistics Parser</h2>
+      <p>Zet dit aan vóórdat je je query draait:</p>
+      <pre>SET STATISTICS IO ON;
+SET STATISTICS TIME ON;</pre>
+      <p>Plak daarna de "Messages"-output hiernaast. De tool formatteert de cijfers per tabel en wijst je op opvallende signalen — physical reads, worktables, scheve CPU/verstreken-tijd, etc.</p>
+      <div class="sp-privacy">100% client-side — wat je hier plakt verlaat nooit je browser, tenzij je zelf op "e-mail me het rapport" klikt.</div>
+    </div>
+
+    <div data-lang-text="en" hidden>
+      <h2>Statistics Parser</h2>
+      <p>Turn this on before running your query:</p>
+      <pre>SET STATISTICS IO ON;
+SET STATISTICS TIME ON;</pre>
+      <p>Then paste the "Messages" output on the right. The tool formats the numbers per table and points out anything worth a second look — physical reads, worktables, skewed CPU/elapsed time, etc.</p>
+      <div class="sp-privacy">100% client-side — anything you paste here never leaves your browser, unless you click "email me the report" yourself.</div>
+    </div>
+  </aside>
+
+  <div class="sp-main">
+    <textarea class="sp-input" placeholder="Plak hier je STATISTICS IO/TIME-output..."></textarea>
+
+    <div class="sp-actions">
+      <button type="button" class="sp-parse">Parsen</button>
+      <button type="button" class="sp-clear sp-secondary">Wissen</button>
+      <button type="button" class="sp-example sp-secondary">Voorbeeld laden</button>
+      <button type="button" class="sp-copy sp-secondary">Resultaat kopiëren</button>
+    </div>
+
+    <div class="sp-results"></div>
+
+    <form class="sp-email-form sp-hidden">
+      <input type="email" class="sp-email-input" placeholder="jouw@email.nl" required>
+      <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="dark"></div>
+      <button type="submit">E-mail me het volledige rapport</button>
+      <span class="sp-email-status"></span>
+    </form>
+  </div>
+
+</div>
+
+<script src="../assets/js/stats-parser.js"></script>
+</body>
+</html>
