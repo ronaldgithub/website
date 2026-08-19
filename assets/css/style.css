@@ -414,6 +414,23 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); bo
   font-family: var(--mono);
 }
 
+/* ---------- tool card (interactive tool, not an article) ---------- */
+.card.card-tool {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, .15), 0 0 28px rgba(56, 189, 248, .12);
+}
+.card.card-tool:hover {
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, .3), 0 0 36px rgba(56, 189, 248, .2);
+}
+.card-tool-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.card-tool-head .card-tag { margin-bottom: 0; }
+
 /* ---------- github repos ---------- */
 #gh-repos .card h3 { font-family: var(--mono); font-size: 1rem; color: var(--accent); }
 #gh-repos .gh-meta {
