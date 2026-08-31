@@ -68,7 +68,7 @@ article .entry-title a:hover { color: #38bdf8; }
 }
 
 /* ---------- code — the DBA's bread and butter ---------- */
-code, kbd, samp {
+:not(pre) > code, kbd, samp {   /* inline code only — keep out of Shiki's <pre><code> */
   font-family: "Cascadia Code", Consolas, "SF Mono", Menlo, monospace;
   color: #22d3ee;
   background: #121927;
@@ -76,7 +76,9 @@ code, kbd, samp {
   padding: .1em .35em;
 }
 
-pre, .wp-block-code, .wp-block-preformatted {
+/* plain core code/preformatted blocks — NOT Code Block Pro's <pre class="shiki">,
+   which carries its own inline Shiki theme (see the Code Block Pro section). */
+pre:not(.shiki), .wp-block-code, .wp-block-preformatted {
   font-family: "Cascadia Code", Consolas, "SF Mono", Menlo, monospace;
   background: #121927 !important;
   color: #dfe7f1;
@@ -86,39 +88,51 @@ pre, .wp-block-code, .wp-block-preformatted {
   overflow-x: auto;               /* long lines scroll, not wrap */
 }
 
-pre code { background: none; color: inherit; padding: 0; }
+pre:not(.shiki) code { background: none; color: inherit; padding: 0; }
 
-/* ---------- SyntaxHighlighter Evolved (the T-SQL script blocks) ----------
-   The plugin renders <div class="wp-block-syntaxhighlighter-code"> and, after
-   its JS runs, <div class="syntaxhighlighter ...">. Line wrapping is controlled
-   by the plugin's own "Wrap long lines" setting (wp-admin → Settings →
-   SyntaxHighlighter) — turn that OFF. The rules below re-skin it dark, widen it
-   past the text column, and act as a CSS backstop against wrapping. */
-.entry-content .wp-block-syntaxhighlighter-code,
-.entry-content .syntaxhighlighter {
-  background: #121927 !important;
-  border: 1px solid #223047 !important;
-  border-radius: 10px !important;
-}
-
-/* widen the block beyond the constrained content column */
-.entry-content .wp-block-syntaxhighlighter-code {
-  width: min(1280px, 94vw);
+/* ---------- Code Block Pro (the T-SQL script blocks) ----------
+   Replaced SyntaxHighlighter Evolved on 2026-08-31. Gutenberg block
+   kevinbatdorf/code-block-pro → front-end wrapper
+   .wp-block-kevinbatdorf-code-block-pro wrapping a Shiki-rendered <pre>.
+   Token colours are baked in as inline styles from the Shiki theme picked
+   per block (set a dark default in the block sidebar — "Poimandres",
+   "Night Owl" and "Vitesse Dark" sit closest to this palette). Don't try to
+   restyle the tokens here; it fights the inline styles and loses. These
+   rules only frame the block: panel border, widen past the text column,
+   slim the horizontal scrollbar (sql.kiwi style), behave on mobile.
+   "Word wrap" is a per-block toggle — leave it off so long T-SQL scrolls. */
+.entry-content .wp-block-kevinbatdorf-code-block-pro {
+  border: 1px solid #223047;
+  border-radius: 10px;
+  overflow: hidden;                 /* clip the <pre> corners to the radius */
+  width: min(1280px, 94vw);         /* wider than the constrained content column */
   max-width: none;
   margin-left: 50%;
   transform: translateX(-50%);
 }
 
-/* scroll long SQL horizontally instead of soft-wrapping it */
-.entry-content .syntaxhighlighter { overflow-x: auto !important; }
-.entry-content .syntaxhighlighter,
-.entry-content .syntaxhighlighter .line,
-.entry-content .syntaxhighlighter .code .container,
-.entry-content .syntaxhighlighter td.code .line,
-.entry-content .syntaxhighlighter td.code .line code {
-  white-space: pre !important;
-  word-wrap: normal !important;
-  overflow-wrap: normal !important;
+.entry-content .wp-block-kevinbatdorf-code-block-pro pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  scrollbar-width: thin;                        /* Firefox */
+  scrollbar-color: #2b3b56 transparent;
+}
+.entry-content .wp-block-kevinbatdorf-code-block-pro pre::-webkit-scrollbar { height: 8px; }
+.entry-content .wp-block-kevinbatdorf-code-block-pro pre::-webkit-scrollbar-track { background: transparent; }
+.entry-content .wp-block-kevinbatdorf-code-block-pro pre::-webkit-scrollbar-thumb {
+  background: #2b3b56;
+  border-radius: 4px;
+}
+.entry-content .wp-block-kevinbatdorf-code-block-pro pre::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+
+/* on narrow screens keep it inside the viewport instead of 94vw-centred */
+@media (max-width: 800px) {
+  .entry-content .wp-block-kevinbatdorf-code-block-pro {
+    width: 100%;
+    margin-left: 0;
+    transform: none;
+  }
 }
 
 /* ---------- "In this article" step index (Blocksy Table of Contents block) ----------
