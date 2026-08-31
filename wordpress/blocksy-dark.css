@@ -121,6 +121,61 @@ pre code { background: none; color: inherit; padding: 0; }
   overflow-wrap: normal !important;
 }
 
+/* ---------- "In this article" step index (Blocksy Table of Contents block) ----------
+   Used on the Blocking & Locking post. In the editor: convert the ten "Step N"
+   paragraphs to H2 headings, then add a Blocksy "Table of Contents" block near
+   the top — Title "In this article", heading level H2, Smooth scroll on,
+   Sticky on, alignment Right so the body text flows beside it. Styling below
+   turns that block into the dark sql.kiwi-style side panel. */
+.entry-content .wp-block-blocksy-table-of-contents,
+.entry-content [class*="table-of-contents"].ct-toc {
+  background: #121927;
+  border: 1px solid #223047;
+  border-radius: 10px;
+  padding: 16px 18px;
+  font-size: .92rem;
+  line-height: 1.4;
+}
+
+/* right-hand panel that sticks while scrolling; body text wraps around it */
+.entry-content .wp-block-blocksy-table-of-contents.alignright {
+  width: 300px;
+  max-width: 38%;
+  margin: 2px 0 22px 28px;
+  position: sticky;
+  top: 100px;                 /* clear the sticky site header */
+}
+
+.entry-content .wp-block-blocksy-table-of-contents .ct-toc-title {
+  color: #dfe7f1;
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+.entry-content .wp-block-blocksy-table-of-contents a {
+  display: block;
+  padding: 3px 0;
+  color: #93a1b5;
+  text-decoration: none;
+}
+.entry-content .wp-block-blocksy-table-of-contents a:hover { color: #38bdf8; }
+.entry-content .wp-block-blocksy-table-of-contents .active > a,
+.entry-content .wp-block-blocksy-table-of-contents a.active {
+  color: #22d3ee;
+  box-shadow: -10px 0 0 -8px #38bdf8;   /* thin accent bar, no layout shift */
+}
+.entry-content .wp-block-blocksy-table-of-contents ul ul a { padding-left: 14px; }
+
+/* on narrow screens drop it into the normal flow above the content */
+@media (max-width: 800px) {
+  .entry-content .wp-block-blocksy-table-of-contents.alignright {
+    float: none;
+    position: static;
+    width: auto;
+    max-width: none;
+    margin-left: 0;
+  }
+}
+
 blockquote, .wp-block-quote {
   border-left: 3px solid #38bdf8;
   background: #0e1420;
