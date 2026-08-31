@@ -53,8 +53,14 @@
         <p>Paste your STATISTICS IO/TIME output and get clear signals instantly — physical reads, worktables, skewed CPU/elapsed time. Free, 100% in your browser, with an optional full report by email.</p>
         <span class="more">Try the tool →</span>
       </a>
+      <a class="card" href="https://dbaronald.nl/blocking-locking-please-help/" rel="noopener" target="_blank">
+        <span class="card-tag">-- blocking · extended events · new</span>
+        <h3>Blocking &amp; Locking, please help..</h3>
+        <p>Instead of reaching for WITH (NOLOCK) in production: capture blocking systematically with an Extended Events session on blocked_process_report, a 5-second blocked process threshold and an Agent job that collects into DBA.dbo.BlockWatch every minute. Erik Darling's sp_HumanEventsBlockViewer turns the XML blocked-process reports into readable output — complete with a BlockWatch_Demo repro and 90-day retention.</p>
+        <span class="more">Read on dbaronald.nl →</span>
+      </a>
       <a class="card" href="https://dbaronald.nl/parameter-sensitive-plans-psp-versus-parameter-sniffing/" rel="noopener" target="_blank">
-        <span class="card-tag">-- parameter sniffing · PSP · new</span>
+        <span class="card-tag">-- parameter sniffing · PSP</span>
         <h3>Parameter Sensitive Plans (PSP) versus Parameter Sniffing</h3>
         <p>SQL Server 2022's Parameter Sensitive Plan optimization replaces the single cached plan with a dispatcher plus up to three query variants, bucketed by parameter cardinality. Tested against Posts.ParentId in the StackOverflow database — a column where a handful of values have thousands of matches and most have almost none — the rare and common cases each get their own optimized plan, visible as predicate_range and QueryVariantID markers in the execution plan.</p>
         <span class="more">Read on dbaronald.nl →</span>
