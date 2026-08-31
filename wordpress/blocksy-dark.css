@@ -99,16 +99,21 @@ pre:not(.shiki) code { background: none; color: inherit; padding: 0; }
    "Night Owl" and "Vitesse Dark" sit closest to this palette). Don't try to
    restyle the tokens here; it fights the inline styles and loses. These
    rules only frame the block: panel border, widen past the text column,
-   slim the horizontal scrollbar (sql.kiwi style), behave on mobile.
-   "Word wrap" is a per-block toggle — leave it off so long T-SQL scrolls. */
+   slim the horizontal scrollbar (sql.kiwi style).
+   "Word wrap" is a per-block toggle — leave it off so long T-SQL scrolls.
+
+   Widening: Blocksy's is-layout-constrained rule already sets
+   `margin-left/right: auto !important` on every direct child, so it centres
+   whatever width we give the block. Just set the width + drop the theme's
+   max-width; do NOT add margin tricks or transforms (an earlier
+   translateX(-50%) here fought the auto-margin and shoved every block off
+   to the left — that was the "not centred" bug). */
 .entry-content .wp-block-kevinbatdorf-code-block-pro {
   border: 1px solid #223047;
   border-radius: 10px;
   overflow: hidden;                 /* clip the <pre> corners to the radius */
-  width: min(1280px, 94vw);         /* wider than the constrained content column */
-  max-width: none;
-  margin-left: 50%;
-  transform: translateX(-50%);
+  width: min(1280px, 100%);         /* wider than the text column, never past the page */
+  max-width: none;                  /* beat --wp--style--global--content-size */
 }
 
 .entry-content .wp-block-kevinbatdorf-code-block-pro pre {
@@ -126,14 +131,6 @@ pre:not(.shiki) code { background: none; color: inherit; padding: 0; }
 }
 .entry-content .wp-block-kevinbatdorf-code-block-pro pre::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
 
-/* on narrow screens keep it inside the viewport instead of 94vw-centred */
-@media (max-width: 800px) {
-  .entry-content .wp-block-kevinbatdorf-code-block-pro {
-    width: 100%;
-    margin-left: 0;
-    transform: none;
-  }
-}
 
 /* ---------- "In this article" step index (Blocksy Table of Contents block) ----------
    Used on the Blocking & Locking post. In the editor: convert the ten "Step N"
