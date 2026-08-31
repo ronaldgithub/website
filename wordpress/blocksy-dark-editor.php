@@ -14,6 +14,10 @@
  *   Paste everything below this comment (without the opening <?php line),
  *   set Location: Admin Only, then Activate.
  * Deactivate the snippet to restore the white editor.
+ *
+ * Code Block Pro blocks style themselves in the editor (inline Shiki output,
+ * same as the front end) and need nothing here — the .wp-block-code rules
+ * below are only for the occasional plain core code block.
  */
 
 add_action( 'enqueue_block_assets', function () {
