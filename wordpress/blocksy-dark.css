@@ -83,10 +83,43 @@ pre, .wp-block-code, .wp-block-preformatted {
   border: 1px solid #223047;
   border-radius: 10px;
   padding: 16px;
-  overflow-x: auto;
+  overflow-x: auto;               /* long lines scroll, not wrap */
 }
 
 pre code { background: none; color: inherit; padding: 0; }
+
+/* ---------- SyntaxHighlighter Evolved (the T-SQL script blocks) ----------
+   The plugin renders <div class="wp-block-syntaxhighlighter-code"> and, after
+   its JS runs, <div class="syntaxhighlighter ...">. Line wrapping is controlled
+   by the plugin's own "Wrap long lines" setting (wp-admin → Settings →
+   SyntaxHighlighter) — turn that OFF. The rules below re-skin it dark, widen it
+   past the text column, and act as a CSS backstop against wrapping. */
+.entry-content .wp-block-syntaxhighlighter-code,
+.entry-content .syntaxhighlighter {
+  background: #121927 !important;
+  border: 1px solid #223047 !important;
+  border-radius: 10px !important;
+}
+
+/* widen the block beyond the constrained content column */
+.entry-content .wp-block-syntaxhighlighter-code {
+  width: min(1280px, 94vw);
+  max-width: none;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+/* scroll long SQL horizontally instead of soft-wrapping it */
+.entry-content .syntaxhighlighter { overflow-x: auto !important; }
+.entry-content .syntaxhighlighter,
+.entry-content .syntaxhighlighter .line,
+.entry-content .syntaxhighlighter .code .container,
+.entry-content .syntaxhighlighter td.code .line,
+.entry-content .syntaxhighlighter td.code .line code {
+  white-space: pre !important;
+  word-wrap: normal !important;
+  overflow-wrap: normal !important;
+}
 
 blockquote, .wp-block-quote {
   border-left: 3px solid #38bdf8;
