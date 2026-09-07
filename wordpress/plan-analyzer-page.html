@@ -1,0 +1,131 @@
+<!--
+  dbaronald.nl — Execution Plan Analyzer page template / local test harness.
+
+  This file is what execution-plan-analyzer-handler.php's
+  [dbaronald_plan_analyzer] shortcode renders on the live site (with a real
+  WP nonce + admin-ajax URL substituted in — see that file). Kept here as a
+  standalone copy so the parsing/findings engine
+  (assets/js/execution-plan-analyzer.js) can be tested locally with
+  `python -m http.server 8123` from the repo root before anything touches
+  WordPress. The "Email me the full report" button will fail harmlessly in
+  this standalone copy (no real nonce/endpoint) — that's expected; test the
+  email path against a staging WordPress instead (see CLAUDE.md).
+
+  execution-plan-analyzer.js itself lives at
+  assets/js/execution-plan-analyzer.js — NOT under wordpress/ — because it
+  deploys automatically via the normal dbaronald.com git-push pipeline (see
+  CLAUDE.md), and the live WordPress page loads it straight from
+  https://dbaronald.com/assets/js/execution-plan-analyzer.js via a plain
+  cross-origin <script src>. That avoids maintaining a second copy pasted
+  into wp-admin (script tags don't need CORS; only fetch/XHR do). Only the
+  WordPress-specific glue (shortcode markup + AJAX handler) lives under
+  wordpress/.
+
+  Install on the live site: see the header comment in
+  wordpress/execution-plan-analyzer-handler.php.
+-->
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Execution Plan Analyzer — local test</title>
+<!--
+  Cloudflare Turnstile test key — always passes, never call the real
+  siteverify API from local testing. See:
+  https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+  The live site uses a real key from the Cloudflare dashboard instead —
+  see wordpress/execution-plan-analyzer-handler.php.
+-->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<style>
+  body { background:#0a0e14; color:#dfe7f1; font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif; margin:0; padding:32px 16px; }
+  .plan-analyzer { max-width:1000px; margin:0 auto; display:grid; grid-template-columns:280px 1fr; gap:28px; }
+  @media (max-width: 720px) { .plan-analyzer { grid-template-columns:1fr; } }
+  .epa-panel { background:#121927; border:1px solid #223047; border-radius:10px; padding:20px; align-self:start; }
+  .epa-panel h2 { margin-top:0; font-size:1.05rem; color:#dfe7f1; }
+  .epa-panel code { font-family:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace; color:#22d3ee; background:#0e1420; border-radius:4px; padding:.1em .35em; }
+  .epa-privacy { margin-top:16px; padding-top:14px; border-top:1px solid #223047; font-size:.85rem; color:#93a1b5; }
+  .epa-lang-switch { margin-bottom:16px; font-family:monospace; font-size:.85rem; }
+  .epa-lang-switch a { color:#93a1b5; text-decoration:none; padding:2px 6px; }
+  .epa-lang-switch a.active { color:#38bdf8; font-weight:bold; }
+  .epa-main { display:flex; flex-direction:column; gap:14px; }
+  .epa-input { width:100%; min-height:220px; box-sizing:border-box; background:#121927; color:#dfe7f1; border:1px solid #223047; border-radius:8px; padding:12px; font-family:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace; font-size:.85rem; resize:vertical; }
+  .epa-input:focus { border-color:#38bdf8; outline:none; }
+  .epa-upload { font-size:.85rem; color:#93a1b5; }
+  .epa-upload input[type="file"] { color:#dfe7f1; font-size:.85rem; }
+  .epa-actions { display:flex; gap:10px; flex-wrap:wrap; }
+  .epa-actions button { background:#38bdf8; color:#04121d; border:none; border-radius:8px; padding:9px 16px; font-size:.9rem; cursor:pointer; }
+  .epa-actions button:hover { background:#22d3ee; }
+  .epa-actions button.epa-secondary { background:transparent; color:#dfe7f1; border:1px solid #223047; }
+  .epa-actions button.epa-secondary:hover { border-color:#38bdf8; color:#38bdf8; }
+  .epa-results { min-height:20px; }
+  .epa-empty { color:#93a1b5; font-style:italic; }
+  .epa-op-title, .epa-findings-title { font-size:.95rem; margin-bottom:8px; }
+  .epa-table-wrap { overflow-x:auto; }
+  .epa-table { width:100%; border-collapse:collapse; font-size:.88rem; }
+  .epa-table th, .epa-table td { border:1px solid #223047; padding:7px 10px; text-align:right; white-space:nowrap; }
+  .epa-table th:first-child, .epa-table td:first-child { text-align:left; }
+  .epa-table th { background:#121927; color:#dfe7f1; }
+  .epa-node-id { color:#93a1b5; }
+  .epa-findings { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .pill { display:inline-block; font-family:monospace; font-size:.82rem; padding:6px 12px; border-radius:8px; border:1px solid #223047; background:#121927; color:#93a1b5; }
+  .pill-accent { color:#38bdf8; border-color:rgba(56,189,248,.4); background:rgba(56,189,248,.08); }
+  .pill-amber { color:#fbbf24; border-color:rgba(251,191,36,.4); background:rgba(251,191,36,.08); }
+  .epa-email-form { display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding-top:10px; border-top:1px solid #223047; }
+  .epa-email-form input[type="email"] { background:#121927; color:#dfe7f1; border:1px solid #223047; border-radius:8px; padding:8px 12px; min-width:220px; }
+  .epa-hidden { display:none; }
+  .epa-email-status { font-size:.85rem; color:#93a1b5; }
+</style>
+</head>
+<body>
+
+<div class="plan-analyzer" data-lang="nl" data-ajax-url="#" data-nonce="local-test">
+
+  <aside class="epa-panel">
+    <div class="epa-lang-switch">
+      <a href="#" data-set-lang="nl" class="active">NL</a> | <a href="#" data-set-lang="en">EN</a>
+    </div>
+
+    <div data-lang-text="nl">
+      <h2>Execution Plan Analyzer</h2>
+      <p>Plak de <code>Show Execution Plan XML</code> (rechtsklik op het plan in SSMS &rarr; "Show Execution Plan XML"), of upload een <code>.sqlplan</code>-bestand. De tool leest het plan uit en wijst je op bekende signalen — spills naar tempdb, impliciete conversies, scheve schattingen, key lookups, ontbrekende indexen en overbodige parallellie.</p>
+      <div class="epa-privacy">100% client-side — wat je hier plakt verlaat nooit je browser, tenzij je zelf op "e-mail me het rapport" klikt.</div>
+    </div>
+
+    <div data-lang-text="en" hidden>
+      <h2>Execution Plan Analyzer</h2>
+      <p>Paste the <code>Show Execution Plan XML</code> (right-click the plan in SSMS &rarr; "Show Execution Plan XML"), or upload a <code>.sqlplan</code> file. The tool reads the plan and points out known red flags — spills to tempdb, implicit conversions, skewed estimates, key lookups, missing indexes and needless parallelism.</p>
+      <div class="epa-privacy">100% client-side — anything you paste here never leaves your browser, unless you click "email me the report" yourself.</div>
+    </div>
+  </aside>
+
+  <div class="epa-main">
+    <textarea class="epa-input" placeholder="Plak hier de Show Execution Plan XML, of upload een .sqlplan-bestand..."></textarea>
+
+    <label class="epa-upload">
+      <span class="epa-upload-label">Of upload een .sqlplan-bestand</span>
+      <input type="file" class="epa-file-input" accept=".sqlplan,.xml,text/xml">
+    </label>
+
+    <div class="epa-actions">
+      <button type="button" class="epa-analyze">Analyseer</button>
+      <button type="button" class="epa-clear epa-secondary">Wissen</button>
+      <button type="button" class="epa-example epa-secondary">Voorbeeld laden</button>
+      <button type="button" class="epa-copy epa-secondary">Resultaat kopiëren</button>
+    </div>
+
+    <div class="epa-results"></div>
+
+    <form class="epa-email-form epa-hidden">
+      <input type="email" class="epa-email-input" placeholder="jouw@email.nl" required>
+      <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="dark"></div>
+      <button type="submit">E-mail me het volledige rapport</button>
+      <span class="epa-email-status"></span>
+    </form>
+  </div>
+
+</div>
+
+<script src="../assets/js/execution-plan-analyzer.js"></script>
+</body>
+</html>
