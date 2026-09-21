@@ -265,41 +265,6 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); bo
 .fact-card li .k { color: var(--muted); }
 .fact-card li .v { text-align: right; }
 
-/* ---------- skills ---------- */
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 18px 40px;
-}
-.skill { padding: 6px 0; }
-.skill-top {
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--mono);
-  font-size: .92rem;
-  margin-bottom: 8px;
-}
-.skill-top .pct { color: var(--accent); }
-.skill-bar {
-  height: 9px;
-  background: var(--panel-2);
-  border-radius: 6px;
-  overflow: hidden;
-}
-.skill-bar i {
-  display: block;
-  height: 100%;
-  width: 0;
-  border-radius: 6px;
-  background: linear-gradient(90deg, #0ea5e9, var(--accent-2));
-  transition: width 1.1s cubic-bezier(.25, .8, .3, 1);
-}
-.skill-bar.in-view i { width: var(--w); }
-
-.skill-photo { margin-top: 40px; max-width: 420px; }
-.skill-photo img { width: 100%; height: auto; display: block; border-radius: var(--radius); border: 1px solid var(--border); }
-.skill-photo figcaption { margin-top: 10px; font-size: .88rem; color: var(--muted); }
-
 /* ---------- pill badge (shared: clients cloud / certifications) ---------- */
 .pill,
 .clients-cloud .tags span {
@@ -315,6 +280,7 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); bo
 }
 .pill-accent { color: var(--accent); border-color: rgba(56, 189, 248, .4); background: rgba(56, 189, 248, .08); }
 .pill-amber  { color: var(--amber);  border-color: rgba(251, 191, 36, .4); background: rgba(251, 191, 36, .08); }
+.pill-green  { color: var(--green);  border-color: rgba(74, 222, 128, .4); background: rgba(74, 222, 128, .08); }
 
 /* ---------- certifications ---------- */
 .cert-list { list-style: none; }
@@ -349,12 +315,14 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); bo
   background: var(--bg);
   border: 3px solid var(--accent);
 }
+.tl-item--current::before { border-color: var(--green); border-style: dashed; }
 .tl-date {
   font-family: var(--mono);
   font-size: .85rem;
   color: var(--accent);
   margin-bottom: 3px;
 }
+.tl-date .pill { margin-left: 8px; vertical-align: 1px; }
 .tl-item h3 { font-size: 1.12rem; margin-bottom: 4px; }
 .tl-item h3 .role { color: var(--muted); font-weight: 400; font-size: .92rem; }
 .tl-item p { color: var(--muted); font-size: .96rem; max-width: 46em; }
@@ -557,7 +525,6 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); bo
 .reveal.in-view { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
-  .skill-bar i { transition: none; }
   html { scroll-behavior: auto; }
 }
 

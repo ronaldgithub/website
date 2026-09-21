@@ -1,4 +1,4 @@
-/* dbaronald.com — interactions: typing terminal, reveal, skills,
+/* dbaronald.com — interactions: typing terminal, reveal,
    GitHub repos widget, SQL tip rotator, language switch, mobile nav */
 
 (function () {
@@ -49,8 +49,8 @@
     spySections.forEach(function (s) { spy.observe(s); });
   }
 
-  /* ---------- reveal on scroll + skill bars ---------- */
-  var observed = document.querySelectorAll(".reveal, .skill-bar");
+  /* ---------- reveal on scroll ---------- */
+  var observed = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window && observed.length) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
