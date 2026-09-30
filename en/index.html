@@ -221,6 +221,15 @@ data-result="&lt;span class='result'&gt;Ronald de Groot | Execution plans · Ind
       <p class="lead">Alongside consulting work, I also build my own tooling — AI-assisted with Claude Code — for problems the standard tools don't handle well.</p>
     </div>
     <div class="cards">
+      <a class="card reveal card-tool" href="https://dbaronald.nl/log-shipping-to-fabric/" rel="noopener" target="_blank">
+        <div class="card-tool-head">
+          <span class="card-tag">-- fabric · parquet · duckdb</span>
+          <span class="pill pill-accent">TOOL</span>
+        </div>
+        <h3>Log shipping to Fabric?</h3>
+        <p>Shipping large SQL Server tables into Microsoft Fabric for analytics, without real log shipping: SQLtoParquet exports tables to Parquet, uploads them to a Fabric workspace, and validates with Spark. On every run, DuckDB diffs the old and new snapshot to work out exactly which rows were added, changed or removed, instead of re-exporting the whole table. Self-contained Windows executable, no .NET install required. (In Dutch)</p>
+        <span class="more">Try the tool →</span>
+      </a>
       <a class="card reveal card-tool" href="https://github.com/ronaldgithub/SQLModelViewer" rel="noopener" target="_blank">
         <div class="card-tool-head">
           <span class="card-tag">-- C# · open source · new</span>
@@ -256,15 +265,6 @@ data-result="&lt;span class='result'&gt;Ronald de Groot | Execution plans · Ind
         </div>
         <h3>Statistics Parser</h3>
         <p>Paste your STATISTICS IO/TIME output and get clear signals instantly — physical reads, worktables, skewed CPU/elapsed time. Free, 100% in your browser, with an optional full report by email.</p>
-        <span class="more">Try the tool →</span>
-      </a>
-      <a class="card reveal card-tool" href="https://dbaronald.nl/log-shipping-to-fabric/" rel="noopener" target="_blank">
-        <div class="card-tool-head">
-          <span class="card-tag">-- fabric · parquet · duckdb</span>
-          <span class="pill pill-accent">TOOL</span>
-        </div>
-        <h3>Log shipping to Fabric?</h3>
-        <p>Shipping large SQL Server tables into Microsoft Fabric for analytics, without real log shipping: SQLtoParquet exports tables to Parquet, uploads them to a Fabric workspace, and validates with Spark. On every run, DuckDB diffs the old and new snapshot to work out exactly which rows were added, changed or removed, instead of re-exporting the whole table. Self-contained Windows executable, no .NET install required. (In Dutch)</p>
         <span class="more">Try the tool →</span>
       </a>
     </div>
