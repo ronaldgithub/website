@@ -221,8 +221,11 @@ data-result="&lt;span class='result'&gt;Ronald de Groot | Execution plans · Ind
       <p class="lead">Alongside consulting work, I also build my own tooling — AI-assisted with Claude Code — for problems the standard tools don't handle well.</p>
     </div>
     <div class="cards">
-      <a class="card reveal" href="https://github.com/ronaldgithub/SQLModelViewer" rel="noopener" target="_blank">
-        <span class="card-tag">-- C# · open source · new</span>
+      <a class="card reveal card-tool" href="https://github.com/ronaldgithub/SQLModelViewer" rel="noopener" target="_blank">
+        <div class="card-tool-head">
+          <span class="card-tag">-- C# · open source · new</span>
+          <span class="pill pill-accent">TOOL</span>
+        </div>
         <img class="card-img" src="/assets/img/sqlmodelviewer.jpg" alt="SQLModelViewer — interactive, auto-generated entity-relationship diagram of a SQL Server database" width="1080" height="378" loading="lazy">
         <h3>SQLModelViewer</h3>
         <p>Interactive ER diagrams for SQL Server, auto-generated from the schema — built to replace SSMS's database diagram tool, which is slow, doesn't scale, and has no search or filtering. Produces a single self-contained HTML file with pan/zoom, search and isolate mode, viewable in any browser.</p>
@@ -255,6 +258,15 @@ data-result="&lt;span class='result'&gt;Ronald de Groot | Execution plans · Ind
         <p>Paste your STATISTICS IO/TIME output and get clear signals instantly — physical reads, worktables, skewed CPU/elapsed time. Free, 100% in your browser, with an optional full report by email.</p>
         <span class="more">Try the tool →</span>
       </a>
+      <a class="card reveal card-tool" href="https://dbaronald.nl/log-shipping-to-fabric/" rel="noopener" target="_blank">
+        <div class="card-tool-head">
+          <span class="card-tag">-- fabric · parquet · duckdb</span>
+          <span class="pill pill-accent">TOOL</span>
+        </div>
+        <h3>Log shipping to Fabric?</h3>
+        <p>Shipping large SQL Server tables into Microsoft Fabric for analytics, without real log shipping: SQLtoParquet exports tables to Parquet, uploads them to a Fabric workspace, and validates with Spark. On every run, DuckDB diffs the old and new snapshot to work out exactly which rows were added, changed or removed, instead of re-exporting the whole table. Self-contained Windows executable, no .NET install required. (In Dutch)</p>
+        <span class="more">Try the tool →</span>
+      </a>
     </div>
   </div>
 </section>
@@ -267,12 +279,6 @@ data-result="&lt;span class='result'&gt;Ronald de Groot | Execution plans · Ind
       <p class="lead">Practical articles about the topics I work with every day.</p>
     </div>
     <div class="cards">
-      <a class="card reveal" href="https://dbaronald.nl/datamodel-diagrams/" rel="noopener" target="_blank">
-        <span class="card-tag">-- datamodel · diagrams · new</span>
-        <h3>Datamodel Diagrams</h3>
-        <p>Who votes for removing the "Create Diagram" feature in SSMS? PowerDesigner and SSMS diagrams used to be the standard — now AI does it better: Claude generates usable datamodel diagrams without the manual rearranging SSMS 22 still demands, shown through a general datamodel view, a single-table diagram and a side-by-side comparison against SSMS 22's own output.</p>
-        <span class="more">Read on dbaronald.nl →</span>
-      </a>
       <a class="card reveal" href="https://dbaronald.nl/left-join-why-your-filter-returns-too-many-rows-or-too-few/" rel="noopener" target="_blank">
         <span class="card-tag">-- left join · on vs where</span>
         <h3>LEFT JOIN: why your filter returns too many rows — or too few</h3>
